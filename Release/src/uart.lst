@@ -1,0 +1,149 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.7.0 #10231 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module uart
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _UART_rx_cur_i
+                                     12 	.globl _UART_rx_start_i
+                                     13 	.globl _UART_rx
+                                     14 	.globl _uart_init
+                                     15 	.globl _uart_write
+                                     16 	.globl _uart_read
+                                     17 	.globl _UART_read_byte
+                                     18 ;--------------------------------------------------------
+                                     19 ; ram data
+                                     20 ;--------------------------------------------------------
+                                     21 	.area DATA
+      000000                         22 _UART_rx::
+      000000                         23 	.ds 30
+                                     24 ;--------------------------------------------------------
+                                     25 ; ram data
+                                     26 ;--------------------------------------------------------
+                                     27 	.area INITIALIZED
+      000000                         28 _UART_rx_start_i::
+      000000                         29 	.ds 1
+      000001                         30 _UART_rx_cur_i::
+      000001                         31 	.ds 1
+                                     32 ;--------------------------------------------------------
+                                     33 ; absolute external ram data
+                                     34 ;--------------------------------------------------------
+                                     35 	.area DABS (ABS)
+                                     36 ;--------------------------------------------------------
+                                     37 ; global & static initialisations
+                                     38 ;--------------------------------------------------------
+                                     39 	.area HOME
+                                     40 	.area GSINIT
+                                     41 	.area GSFINAL
+                                     42 	.area GSINIT
+                                     43 ;--------------------------------------------------------
+                                     44 ; Home
+                                     45 ;--------------------------------------------------------
+                                     46 	.area HOME
+                                     47 	.area HOME
+                                     48 ;--------------------------------------------------------
+                                     49 ; code
+                                     50 ;--------------------------------------------------------
+                                     51 	.area CODE
+                                     52 ;	../src/uart.c: 8: void uart_init() {
+                                     53 ;	-----------------------------------------
+                                     54 ;	 function uart_init
+                                     55 ;	-----------------------------------------
+      000000                         56 _uart_init:
+                                     57 ;	../src/uart.c: 10: tmp = UART1->SR;
+      000000 AE 52 30         [ 2]   58 	ldw	x, #0x5230
+      000003 F6               [ 1]   59 	ld	a, (x)
+                                     60 ;	../src/uart.c: 11: tmp = UART1->DR;
+      000004 AE 52 31         [ 2]   61 	ldw	x, #0x5231
+      000007 F6               [ 1]   62 	ld	a, (x)
+                                     63 ;	../src/uart.c: 12: UART1->CR1 = 0x00;
+      000008 35 00 52 34      [ 1]   64 	mov	0x5234+0, #0x00
+                                     65 ;	../src/uart.c: 14: UART1->BRR2 = 0x03; //((div >> 8) & 0xF0) + (div & 0x0F);
+      00000C 35 03 52 33      [ 1]   66 	mov	0x5233+0, #0x03
+                                     67 ;	../src/uart.c: 15: UART1->BRR1 = 0x6a; //div >> 4;
+      000010 35 6A 52 32      [ 1]   68 	mov	0x5232+0, #0x6a
+                                     69 ;	../src/uart.c: 16: UART1->CR2 = UART1_CR2_TEN | UART1_CR2_REN | UART1_CR2_RIEN; // Allow RX/TX, generate ints on rx
+      000014 35 2C 52 35      [ 1]   70 	mov	0x5235+0, #0x2c
+                                     71 ;	../src/uart.c: 17: }
+      000018 81               [ 4]   72 	ret
+                                     73 ;	../src/uart.c: 19: void uart_write(uint8_t data) {
+                                     74 ;	-----------------------------------------
+                                     75 ;	 function uart_write
+                                     76 ;	-----------------------------------------
+      000019                         77 _uart_write:
+                                     78 ;	../src/uart.c: 20: UART1->DR = data;
+      000019 AE 52 31         [ 2]   79 	ldw	x, #0x5231
+      00001C 7B 03            [ 1]   80 	ld	a, (0x03, sp)
+      00001E F7               [ 1]   81 	ld	(x), a
+                                     82 ;	../src/uart.c: 21: while (!(UART1->SR & UART1_SR_TC)) ;
+      00001F                         83 00101$:
+      00001F C6 52 30         [ 1]   84 	ld	a, 0x5230
+      000022 A5 40            [ 1]   85 	bcp	a, #0x40
+      000024 27 F9            [ 1]   86 	jreq	00101$
+                                     87 ;	../src/uart.c: 22: UART1->SR &= ~(UART1_SR_TC);
+      000026 A4 BF            [ 1]   88 	and	a, #0xbf
+      000028 C7 52 30         [ 1]   89 	ld	0x5230, a
+                                     90 ;	../src/uart.c: 23: }
+      00002B 81               [ 4]   91 	ret
+                                     92 ;	../src/uart.c: 25: uint8_t uart_read() {
+                                     93 ;	-----------------------------------------
+                                     94 ;	 function uart_read
+                                     95 ;	-----------------------------------------
+      00002C                         96 _uart_read:
+                                     97 ;	../src/uart.c: 28: while (!(UART1->SR & UART1_SR_RXNE)) ;
+      00002C                         98 00101$:
+      00002C C6 52 30         [ 1]   99 	ld	a, 0x5230
+      00002F A5 20            [ 1]  100 	bcp	a, #0x20
+      000031 27 F9            [ 1]  101 	jreq	00101$
+                                    102 ;	../src/uart.c: 29: return UART1->DR;
+      000033 C6 52 31         [ 1]  103 	ld	a, 0x5231
+                                    104 ;	../src/uart.c: 30: }
+      000036 81               [ 4]  105 	ret
+                                    106 ;	../src/uart.c: 37: uint8_t UART_read_byte(uint8_t *byte){
+                                    107 ;	-----------------------------------------
+                                    108 ;	 function UART_read_byte
+                                    109 ;	-----------------------------------------
+      000037                        110 _UART_read_byte:
+      000037 52 02            [ 2]  111 	sub	sp, #2
+                                    112 ;	../src/uart.c: 38: if(UART_rx_start_i == UART_rx_cur_i) // buffer is empty
+      000039 C6u00u01         [ 1]  113 	ld	a, _UART_rx_cur_i+0
+      00003C C1u00u00         [ 1]  114 	cp	a, _UART_rx_start_i+0
+      00003F 26 03            [ 1]  115 	jrne	00102$
+                                    116 ;	../src/uart.c: 39: return 0;
+      000041 4F               [ 1]  117 	clr	a
+      000042 20 23            [ 2]  118 	jra	00108$
+      000044                        119 00102$:
+                                    120 ;	../src/uart.c: 40: *byte = UART_rx[UART_rx_start_i++];
+      000044 16 05            [ 2]  121 	ldw	y, (0x05, sp)
+      000046 AEr00r00         [ 2]  122 	ldw	x, #_UART_rx+0
+      000049 1F 01            [ 2]  123 	ldw	(0x01, sp), x
+      00004B C6u00u00         [ 1]  124 	ld	a, _UART_rx_start_i+0
+      00004E 72 5Cu00u00      [ 1]  125 	inc	_UART_rx_start_i+0
+      000052 5F               [ 1]  126 	clrw	x
+      000053 97               [ 1]  127 	ld	xl, a
+      000054 72 FB 01         [ 2]  128 	addw	x, (0x01, sp)
+      000057 F6               [ 1]  129 	ld	a, (x)
+      000058 90 F7            [ 1]  130 	ld	(y), a
+                                    131 ;	../src/uart.c: 41: check_UART_pointer(UART_rx_start_i);
+      00005A C6u00u00         [ 1]  132 	ld	a, _UART_rx_start_i+0
+      00005D A1 1E            [ 1]  133 	cp	a, #0x1e
+      00005F 26 04            [ 1]  134 	jrne	00106$
+      000061 72 5Fu00u00      [ 1]  135 	clr	_UART_rx_start_i+0
+      000065                        136 00106$:
+                                    137 ;	../src/uart.c: 42: return 1;
+      000065 A6 01            [ 1]  138 	ld	a, #0x01
+      000067                        139 00108$:
+                                    140 ;	../src/uart.c: 43: }
+      000067 5B 02            [ 2]  141 	addw	sp, #2
+      000069 81               [ 4]  142 	ret
+                                    143 	.area CODE
+                                    144 	.area INITIALIZER
+      000000                        145 __xinit__UART_rx_start_i:
+      000000 00                     146 	.db #0x00	; 0
+      000001                        147 __xinit__UART_rx_cur_i:
+      000001 00                     148 	.db #0x00	; 0
+                                    149 	.area CABS (ABS)

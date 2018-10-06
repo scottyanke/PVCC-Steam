@@ -1,0 +1,140 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.6.0 #9615 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module uart
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _UART_rx_cur_i
+                                     12 	.globl _UART_rx_start_i
+                                     13 	.globl _UART_rx
+                                     14 	.globl _uart_init
+                                     15 	.globl _uart_write
+                                     16 	.globl _uart_read
+                                     17 	.globl _UART_read_byte
+                                     18 ;--------------------------------------------------------
+                                     19 ; ram data
+                                     20 ;--------------------------------------------------------
+                                     21 	.area DATA
+      000000                         22 _UART_rx::
+      000000                         23 	.ds 8
+                                     24 ;--------------------------------------------------------
+                                     25 ; ram data
+                                     26 ;--------------------------------------------------------
+                                     27 	.area INITIALIZED
+      000000                         28 _UART_rx_start_i::
+      000000                         29 	.ds 1
+      000001                         30 _UART_rx_cur_i::
+      000001                         31 	.ds 1
+                                     32 ;--------------------------------------------------------
+                                     33 ; absolute external ram data
+                                     34 ;--------------------------------------------------------
+                                     35 	.area DABS (ABS)
+                                     36 ;--------------------------------------------------------
+                                     37 ; global & static initialisations
+                                     38 ;--------------------------------------------------------
+                                     39 	.area HOME
+                                     40 	.area GSINIT
+                                     41 	.area GSFINAL
+                                     42 	.area GSINIT
+                                     43 ;--------------------------------------------------------
+                                     44 ; Home
+                                     45 ;--------------------------------------------------------
+                                     46 	.area HOME
+                                     47 	.area HOME
+                                     48 ;--------------------------------------------------------
+                                     49 ; code
+                                     50 ;--------------------------------------------------------
+                                     51 	.area CODE
+                                     52 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 8: void uart_init() {
+                                     53 ;	-----------------------------------------
+                                     54 ;	 function uart_init
+                                     55 ;	-----------------------------------------
+      000000                         56 _uart_init:
+                                     57 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 12: UART1->BRR2 = ((div >> 8) & 0xF0) + (div & 0x0F);
+      000000 35 00 52 33      [ 1]   58 	mov	0x5233+0, #0x00
+                                     59 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 13: UART1->BRR1 = div >> 4;
+      000004 A6 0D            [ 1]   60 	ld	a, #0x0d
+      000006 AE 52 32         [ 2]   61 	ldw	x, #0x5232
+      000009 F7               [ 1]   62 	ld	(x), a
+                                     63 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 16: UART1->CR2 = UART1_CR2_TEN | UART1_CR2_REN | UART1_CR2_RIEN; // Allow RX/TX, generate ints on rx
+      00000A 35 2C 52 35      [ 1]   64 	mov	0x5235+0, #0x2c
+      00000E 81               [ 4]   65 	ret
+                                     66 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 19: void uart_write(uint8_t data) {
+                                     67 ;	-----------------------------------------
+                                     68 ;	 function uart_write
+                                     69 ;	-----------------------------------------
+      00000F                         70 _uart_write:
+                                     71 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 20: UART1->DR = data;
+      00000F AE 52 31         [ 2]   72 	ldw	x, #0x5231
+      000012 7B 03            [ 1]   73 	ld	a, (0x03, sp)
+      000014 F7               [ 1]   74 	ld	(x), a
+                                     75 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 21: while (!(UART1->SR & UART1_SR_TC));
+      000015                         76 00101$:
+      000015 AE 52 30         [ 2]   77 	ldw	x, #0x5230
+      000018 F6               [ 1]   78 	ld	a, (x)
+      000019 A5 40            [ 1]   79 	bcp	a, #0x40
+      00001B 27 F8            [ 1]   80 	jreq	00101$
+      00001D 81               [ 4]   81 	ret
+                                     82 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 24: uint8_t uart_read() {
+                                     83 ;	-----------------------------------------
+                                     84 ;	 function uart_read
+                                     85 ;	-----------------------------------------
+      00001E                         86 _uart_read:
+                                     87 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 25: while (!(UART1->SR & UART1_SR_RXNE));
+      00001E                         88 00101$:
+      00001E AE 52 30         [ 2]   89 	ldw	x, #0x5230
+      000021 F6               [ 1]   90 	ld	a, (x)
+      000022 A5 20            [ 1]   91 	bcp	a, #0x20
+      000024 27 F8            [ 1]   92 	jreq	00101$
+                                     93 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 26: return UART1->DR;
+      000026 AE 52 31         [ 2]   94 	ldw	x, #0x5231
+      000029 F6               [ 1]   95 	ld	a, (x)
+      00002A 81               [ 4]   96 	ret
+                                     97 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 34: uint8_t UART_read_byte(uint8_t *byte){
+                                     98 ;	-----------------------------------------
+                                     99 ;	 function UART_read_byte
+                                    100 ;	-----------------------------------------
+      00002B                        101 _UART_read_byte:
+      00002B 52 02            [ 2]  102 	sub	sp, #2
+                                    103 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 35: if(UART_rx_start_i == UART_rx_cur_i) // buffer is empty
+      00002D C6u00u01         [ 1]  104 	ld	a, _UART_rx_cur_i+0
+      000030 C1u00u00         [ 1]  105 	cp	a, _UART_rx_start_i+0
+      000033 26 03            [ 1]  106 	jrne	00102$
+                                    107 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 36: return 0;
+      000035 4F               [ 1]  108 	clr	a
+      000036 20 24            [ 2]  109 	jra	00108$
+      000038                        110 00102$:
+                                    111 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 37: *byte = UART_rx[UART_rx_start_i++];
+      000038 16 05            [ 2]  112 	ldw	y, (0x05, sp)
+      00003A AEr00r00         [ 2]  113 	ldw	x, #_UART_rx+0
+      00003D 1F 01            [ 2]  114 	ldw	(0x01, sp), x
+      00003F C6u00u00         [ 1]  115 	ld	a, _UART_rx_start_i+0
+      000042 97               [ 1]  116 	ld	xl, a
+      000043 72 5Cu00u00      [ 1]  117 	inc	_UART_rx_start_i+0
+      000047 4F               [ 1]  118 	clr	a
+      000048 95               [ 1]  119 	ld	xh, a
+      000049 72 FB 01         [ 2]  120 	addw	x, (0x01, sp)
+      00004C F6               [ 1]  121 	ld	a, (x)
+      00004D 90 F7            [ 1]  122 	ld	(y), a
+                                    123 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 38: check_UART_pointer(UART_rx_start_i);
+      00004F C6u00u00         [ 1]  124 	ld	a, _UART_rx_start_i+0
+      000052 A1 08            [ 1]  125 	cp	a, #0x08
+      000054 26 04            [ 1]  126 	jrne	00106$
+      000056 72 5Fu00u00      [ 1]  127 	clr	_UART_rx_start_i+0
+      00005A                        128 00106$:
+                                    129 ;	/home/scott/Samples/stm8-bare-min/stm8/uart.c: 39: return 1;
+      00005A A6 01            [ 1]  130 	ld	a, #0x01
+      00005C                        131 00108$:
+      00005C 5B 02            [ 2]  132 	addw	sp, #2
+      00005E 81               [ 4]  133 	ret
+                                    134 	.area CODE
+                                    135 	.area INITIALIZER
+      000000                        136 __xinit__UART_rx_start_i:
+      000000 00                     137 	.db #0x00	; 0
+      000001                        138 __xinit__UART_rx_cur_i:
+      000001 00                     139 	.db #0x00	; 0
+                                    140 	.area CABS (ABS)

@@ -1,0 +1,1123 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.7.0 #10231 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module main
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _ADC_init
+                                     13 	.globl _ADC_read
+                                     14 	.globl _InitialiseIWDG
+                                     15 	.globl _InitialiseSystemClock
+                                     16 	.globl _UART_read_byte
+                                     17 	.globl _uart_write
+                                     18 	.globl _uart_init
+                                     19 	.globl _strcpy
+                                     20 	.globl _sprintf
+                                     21 	.globl _printf
+                                     22 	.globl _version
+                                     23 	.globl _address
+                                     24 	.globl _esc
+                                     25 	.globl _Global_time
+                                     26 	.globl _putchar
+                                     27 ;--------------------------------------------------------
+                                     28 ; ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area DATA
+      000000                         31 _Global_time::
+      000000                         32 	.ds 4
+      000004                         33 _esc::
+      000004                         34 	.ds 1
+      000005                         35 _address::
+      000005                         36 	.ds 1
+      000006                         37 _version::
+      000006                         38 	.ds 12
+                                     39 ;--------------------------------------------------------
+                                     40 ; ram data
+                                     41 ;--------------------------------------------------------
+                                     42 	.area INITIALIZED
+                                     43 ;--------------------------------------------------------
+                                     44 ; Stack segment in internal ram 
+                                     45 ;--------------------------------------------------------
+                                     46 	.area	SSEG
+      000000                         47 __start__stack:
+      000000                         48 	.ds	1
+                                     49 
+                                     50 ;--------------------------------------------------------
+                                     51 ; absolute external ram data
+                                     52 ;--------------------------------------------------------
+                                     53 	.area DABS (ABS)
+                                     54 ;--------------------------------------------------------
+                                     55 ; interrupt vector 
+                                     56 ;--------------------------------------------------------
+                                     57 	.area HOME
+      000000                         58 __interrupt_vect:
+      000000 82v00u00u00             59 	int s_GSINIT ; reset
+      000004 82 00 00 00             60 	int 0x0000 ; trap
+      000008 82v00u00u00             61 	int _TLI_IRQHandler ; int0
+      00000C 82v00u00u00             62 	int _AWU_IRQHandler ; int1
+      000010 82v00u00u00             63 	int _CLK_IRQHandler ; int2
+      000014 82v00u00u00             64 	int _EXTI_PORTA_IRQHandler ; int3
+      000018 82v00u00u00             65 	int _EXTI_PORTB_IRQHandler ; int4
+      00001C 82v00u00u00             66 	int _EXTI_PORTC_IRQHandler ; int5
+      000020 82v00u00u00             67 	int _EXTI_PORTD_IRQHandler ; int6
+      000024 82v00u00u00             68 	int _EXTI_PORTE_IRQHandler ; int7
+      000028 82 00 00 00             69 	int 0x0000 ; int8
+      00002C 82 00 00 00             70 	int 0x0000 ; int9
+      000030 82v00u00u00             71 	int _SPI_IRQHandler ; int10
+      000034 82v00u00u00             72 	int _TIM1_UPD_OVF_TRG_BRK_IRQHandler ; int11
+      000038 82v00u00u00             73 	int _TIM1_CAP_COM_IRQHandler ; int12
+      00003C 82v00u00u00             74 	int _TIM2_UPD_OVF_BRK_IRQHandler ; int13
+      000040 82v00u00u00             75 	int _TIM2_CAP_COM_IRQHandler ; int14
+      000044 82 00 00 00             76 	int 0x0000 ; int15
+      000048 82 00 00 00             77 	int 0x0000 ; int16
+      00004C 82v00u00u00             78 	int _UART1_TX_IRQHandler ; int17
+      000050 82v00u00u00             79 	int _UART1_RX_IRQHandler ; int18
+      000054 82v00u00u00             80 	int _I2C_IRQHandler ; int19
+      000058 82 00 00 00             81 	int 0x0000 ; int20
+      00005C 82 00 00 00             82 	int 0x0000 ; int21
+      000060 82v00u00u00             83 	int _ADC1_IRQHandler ; int22
+      000064 82v00u00u00             84 	int _TIM4_UPD_OVF_IRQHandler ; int23
+      000068 82v00u00u00             85 	int _EEPROM_EEC_IRQHandler ; int24
+                                     86 ;--------------------------------------------------------
+                                     87 ; global & static initialisations
+                                     88 ;--------------------------------------------------------
+                                     89 	.area HOME
+                                     90 	.area GSINIT
+                                     91 	.area GSFINAL
+                                     92 	.area GSINIT
+      000000                         93 __sdcc_gs_init_startup:
+      000000                         94 __sdcc_init_data:
+                                     95 ; stm8_genXINIT() start
+      000000 AEr00r00         [ 2]   96 	ldw x, #l_DATA
+      000003 27 07            [ 1]   97 	jreq	00002$
+      000005                         98 00001$:
+      000005 72 4FuFFuFF      [ 1]   99 	clr (s_DATA - 1, x)
+      000009 5A               [ 2]  100 	decw x
+      00000A 26 F9            [ 1]  101 	jrne	00001$
+      00000C                        102 00002$:
+      00000C AEr00r00         [ 2]  103 	ldw	x, #l_INITIALIZER
+      00000F 27 09            [ 1]  104 	jreq	00004$
+      000011                        105 00003$:
+      000011 D6uFFuFF         [ 1]  106 	ld	a, (s_INITIALIZER - 1, x)
+      000014 D7uFFuFF         [ 1]  107 	ld	(s_INITIALIZED - 1, x), a
+      000017 5A               [ 2]  108 	decw	x
+      000018 26 F7            [ 1]  109 	jrne	00003$
+      00001A                        110 00004$:
+                                    111 ; stm8_genXINIT() end
+                                    112 	.area GSFINAL
+      000000 CCr00r6C         [ 2]  113 	jp	__sdcc_program_startup
+                                    114 ;--------------------------------------------------------
+                                    115 ; Home
+                                    116 ;--------------------------------------------------------
+                                    117 	.area HOME
+                                    118 	.area HOME
+      00006C                        119 __sdcc_program_startup:
+      00006C CCr00r95         [ 2]  120 	jp	_main
+                                    121 ;	return from main will return to caller
+                                    122 ;--------------------------------------------------------
+                                    123 ; code
+                                    124 ;--------------------------------------------------------
+                                    125 	.area CODE
+                                    126 ;	../src/main.c: 33: int putchar(int c) {
+                                    127 ;	-----------------------------------------
+                                    128 ;	 function putchar
+                                    129 ;	-----------------------------------------
+      000000                        130 _putchar:
+                                    131 ;	../src/main.c: 34: uart_write(c);
+      000000 7B 04            [ 1]  132 	ld	a, (0x04, sp)
+      000002 88               [ 1]  133 	push	a
+      000003 CDr00r00         [ 4]  134 	call	_uart_write
+      000006 84               [ 1]  135 	pop	a
+                                    136 ;	../src/main.c: 35: return c;
+      000007 1E 03            [ 2]  137 	ldw	x, (0x03, sp)
+                                    138 ;	../src/main.c: 36: }
+      000009 81               [ 4]  139 	ret
+                                    140 ;	../src/main.c: 42: void InitialiseSystemClock()
+                                    141 ;	-----------------------------------------
+                                    142 ;	 function InitialiseSystemClock
+                                    143 ;	-----------------------------------------
+      00000A                        144 _InitialiseSystemClock:
+                                    145 ;	../src/main.c: 44: CLK->ICKR = 0;                       //  Reset the Internal Clock Register.
+      00000A 35 00 50 C0      [ 1]  146 	mov	0x50c0+0, #0x00
+                                    147 ;	../src/main.c: 45: CLK->ICKR = CLK_ICKR_HSIEN;          //  Enable the HSI.
+      00000E 35 01 50 C0      [ 1]  148 	mov	0x50c0+0, #0x01
+                                    149 ;	../src/main.c: 46: CLK->ECKR = 0;                       //  Disable the external clock.
+      000012 35 00 50 C1      [ 1]  150 	mov	0x50c1+0, #0x00
+                                    151 ;	../src/main.c: 47: while (!(CLK->ICKR & CLK_ICKR_HSIRDY)); //  Wait for the HSI to be ready for use.
+      000016                        152 00101$:
+      000016 C6 50 C0         [ 1]  153 	ld	a, 0x50c0
+      000019 A5 02            [ 1]  154 	bcp	a, #0x02
+      00001B 27 F9            [ 1]  155 	jreq	00101$
+                                    156 ;	../src/main.c: 48: CLK->CKDIVR = 0;                     //  Ensure the clocks are running at full speed.
+      00001D 35 00 50 C6      [ 1]  157 	mov	0x50c6+0, #0x00
+                                    158 ;	../src/main.c: 49: CLK->PCKENR1 = 0xff; //CLK_PCKENR1_TIM4 | CLK_PCKENR1_UART1 | CLK_PCKENR1_SPI | CLK_PCKENR1_I2C ;  //  Enable select peripheral clocks.
+      000021 35 FF 50 C7      [ 1]  159 	mov	0x50c7+0, #0xff
+                                    160 ;	../src/main.c: 50: CLK->PCKENR2 = 0xff; //CLK_PCKENR2_AWU;      //  Only enable the AWU watchdog service
+      000025 35 FF 50 CA      [ 1]  161 	mov	0x50ca+0, #0xff
+                                    162 ;	../src/main.c: 51: CLK->CCOR = 0;                       //  Turn off CCO.
+      000029 35 00 50 C9      [ 1]  163 	mov	0x50c9+0, #0x00
+                                    164 ;	../src/main.c: 52: CLK->HSITRIMR = 0;                   //  Turn off any HSIU trimming.
+      00002D 35 00 50 CC      [ 1]  165 	mov	0x50cc+0, #0x00
+                                    166 ;	../src/main.c: 53: CLK->SWIMCCR = 0;                    //  Set SWIM to run at clock / 2.
+      000031 35 00 50 CD      [ 1]  167 	mov	0x50cd+0, #0x00
+                                    168 ;	../src/main.c: 54: CLK->SWR = 0xe1;                     //  Use HSI as the clock source.
+      000035 35 E1 50 C4      [ 1]  169 	mov	0x50c4+0, #0xe1
+                                    170 ;	../src/main.c: 55: CLK->SWCR = 0;                       //  Reset the clock switch control register.
+      000039 35 00 50 C5      [ 1]  171 	mov	0x50c5+0, #0x00
+                                    172 ;	../src/main.c: 56: CLK->SWCR |= CLK_SWCR_SWEN;          //  Enable switching.
+      00003D 72 12 50 C5      [ 1]  173 	bset	20677, #1
+                                    174 ;	../src/main.c: 57: while (CLK->SWCR & CLK_SWCR_SWBSY);  //  Pause while the clock switch is busy.
+      000041                        175 00104$:
+      000041 C6 50 C5         [ 1]  176 	ld	a, 0x50c5
+      000044 44               [ 1]  177 	srl	a
+      000045 25 FA            [ 1]  178 	jrc	00104$
+                                    179 ;	../src/main.c: 58: }
+      000047 81               [ 4]  180 	ret
+                                    181 ;	../src/main.c: 63: void InitialiseIWDG()
+                                    182 ;	-----------------------------------------
+                                    183 ;	 function InitialiseIWDG
+                                    184 ;	-----------------------------------------
+      000048                        185 _InitialiseIWDG:
+                                    186 ;	../src/main.c: 65: IWDG->KR = 0xcc;         //  Start the independent watchdog.
+      000048 35 CC 50 E0      [ 1]  187 	mov	0x50e0+0, #0xcc
+                                    188 ;	../src/main.c: 66: IWDG->KR = 0x55;         //  Allow the IWDG registers to be programmed.
+      00004C 35 55 50 E0      [ 1]  189 	mov	0x50e0+0, #0x55
+                                    190 ;	../src/main.c: 67: IWDG->PR = 0x06;         //  Prescaler is 6 => each count is 1.02 second with RLR = 0xff
+      000050 35 06 50 E1      [ 1]  191 	mov	0x50e1+0, #0x06
+                                    192 ;	../src/main.c: 68: IWDG->RLR = 0xff;        //  Reload counter.  T = 2 x TLSI x PR x R LR
+      000054 35 FF 50 E2      [ 1]  193 	mov	0x50e2+0, #0xff
+                                    194 ;	../src/main.c: 69: IWDG->KR = 0xaa;         //  Reset the counter.
+      000058 35 AA 50 E0      [ 1]  195 	mov	0x50e0+0, #0xaa
+                                    196 ;	../src/main.c: 70: }
+      00005C 81               [ 4]  197 	ret
+                                    198 ;	../src/main.c: 73: uint16_t ADC_read() {
+                                    199 ;	-----------------------------------------
+                                    200 ;	 function ADC_read
+                                    201 ;	-----------------------------------------
+      00005D                        202 _ADC_read:
+      00005D 52 04            [ 2]  203 	sub	sp, #4
+                                    204 ;	../src/main.c: 75: ADC1->CR1 |= ADC1_CR1_ADON;
+      00005F 72 10 54 01      [ 1]  205 	bset	21505, #0
+                                    206 ;	../src/main.c: 76: while (!(ADC1->CSR & (ADC1_CSR_EOC)));
+      000063                        207 00101$:
+      000063 C6 54 00         [ 1]  208 	ld	a, 0x5400
+      000066 4D               [ 1]  209 	tnz	a
+      000067 2A FA            [ 1]  210 	jrpl	00101$
+                                    211 ;	../src/main.c: 77: adcL = ADC1->DRL;
+      000069 AE 54 05         [ 2]  212 	ldw	x, #0x5405
+      00006C F6               [ 1]  213 	ld	a, (x)
+      00006D 90 97            [ 1]  214 	ld	yl, a
+                                    215 ;	../src/main.c: 78: adcH = ADC1->DRH;
+      00006F AE 54 04         [ 2]  216 	ldw	x, #0x5404
+      000072 F6               [ 1]  217 	ld	a, (x)
+      000073 97               [ 1]  218 	ld	xl, a
+                                    219 ;	../src/main.c: 79: ADC1->CSR &= ~(ADC1_CSR_EOC); // Clear EOC flag
+      000074 72 1F 54 00      [ 1]  220 	bres	21504, #7
+                                    221 ;	../src/main.c: 80: return (adcL | (adcH << 8));
+      000078 9F               [ 1]  222 	ld	a, xl
+      000079 0F 04            [ 1]  223 	clr	(0x04, sp)
+      00007B 0F 01            [ 1]  224 	clr	(0x01, sp)
+      00007D 1A 01            [ 1]  225 	or	a, (0x01, sp)
+      00007F 95               [ 1]  226 	ld	xh, a
+      000080 90 9F            [ 1]  227 	ld	a, yl
+      000082 1A 04            [ 1]  228 	or	a, (0x04, sp)
+      000084 97               [ 1]  229 	ld	xl, a
+                                    230 ;	../src/main.c: 81: }
+      000085 5B 04            [ 2]  231 	addw	sp, #4
+      000087 81               [ 4]  232 	ret
+                                    233 ;	../src/main.c: 82: void ADC_init() {
+                                    234 ;	-----------------------------------------
+                                    235 ;	 function ADC_init
+                                    236 ;	-----------------------------------------
+      000088                        237 _ADC_init:
+                                    238 ;	../src/main.c: 84: ADC1->CSR |= (1 << 2);
+      000088 72 14 54 00      [ 1]  239 	bset	21504, #2
+                                    240 ;	../src/main.c: 86: ADC1->CR2 |= ADC1_CR2_ALIGN;
+      00008C 72 16 54 02      [ 1]  241 	bset	21506, #3
+                                    242 ;	../src/main.c: 88: ADC1->CR1 |= ADC1_CR1_ADON;
+      000090 72 10 54 01      [ 1]  243 	bset	21505, #0
+                                    244 ;	../src/main.c: 89: }
+      000094 81               [ 4]  245 	ret
+                                    246 ;	../src/main.c: 90: void main() {
+                                    247 ;	-----------------------------------------
+                                    248 ;	 function main
+                                    249 ;	-----------------------------------------
+      000095                        250 _main:
+      000095 52 73            [ 2]  251 	sub	sp, #115
+                                    252 ;	../src/main.c: 91: unsigned long esc_time = 0L;
+      000097 5F               [ 1]  253 	clrw	x
+      000098 1F 6C            [ 2]  254 	ldw	(0x6c, sp), x
+      00009A 1F 6A            [ 2]  255 	ldw	(0x6a, sp), x
+                                    256 ;	../src/main.c: 99: esc = 0;
+      00009C 72 5Fu00u04      [ 1]  257 	clr	_esc+0
+                                    258 ;	../src/main.c: 101: sprintf(version,"%02d%02d%02d-%02d%02d", BUILD_YEAR - 2000, BUILD_MONTH, BUILD_DAY, BUILD_HOUR, BUILD_MIN);
+      0000A0 AEr06r33         [ 2]  259 	ldw	x, #___str_2+0
+      0000A3 1F 1C            [ 2]  260 	ldw	(0x1c, sp), x
+      0000A5 F6               [ 1]  261 	ld	a, (x)
+      0000A6 6B 2B            [ 1]  262 	ld	(0x2b, sp), a
+      0000A8 7B 2B            [ 1]  263 	ld	a, (0x2b, sp)
+      0000AA A1 3F            [ 1]  264 	cp	a, #0x3f
+      0000AC 26 06            [ 1]  265 	jrne	00426$
+      0000AE A6 01            [ 1]  266 	ld	a, #0x01
+      0000B0 6B 1B            [ 1]  267 	ld	(0x1b, sp), a
+      0000B2 20 02            [ 2]  268 	jra	00427$
+      0000B4                        269 00426$:
+      0000B4 0F 1B            [ 1]  270 	clr	(0x1b, sp)
+      0000B6                        271 00427$:
+      0000B6 0D 1B            [ 1]  272 	tnz	(0x1b, sp)
+      0000B8 27 07            [ 1]  273 	jreq	00153$
+      0000BA AE 00 63         [ 2]  274 	ldw	x, #0x0063
+      0000BD 1F 19            [ 2]  275 	ldw	(0x19, sp), x
+      0000BF 20 22            [ 2]  276 	jra	00154$
+      0000C1                        277 00153$:
+      0000C1 1E 1C            [ 2]  278 	ldw	x, (0x1c, sp)
+      0000C3 E6 03            [ 1]  279 	ld	a, (0x3, x)
+      0000C5 5F               [ 1]  280 	clrw	x
+      0000C6 97               [ 1]  281 	ld	xl, a
+      0000C7 1D 00 30         [ 2]  282 	subw	x, #0x0030
+      0000CA 89               [ 2]  283 	pushw	x
+      0000CB 58               [ 2]  284 	sllw	x
+      0000CC 58               [ 2]  285 	sllw	x
+      0000CD 72 FB 01         [ 2]  286 	addw	x, (1, sp)
+      0000D0 58               [ 2]  287 	sllw	x
+      0000D1 5B 02            [ 2]  288 	addw	sp, #2
+      0000D3 1F 17            [ 2]  289 	ldw	(0x17, sp), x
+      0000D5 1E 1C            [ 2]  290 	ldw	x, (0x1c, sp)
+      0000D7 E6 04            [ 1]  291 	ld	a, (0x4, x)
+      0000D9 5F               [ 1]  292 	clrw	x
+      0000DA 97               [ 1]  293 	ld	xl, a
+      0000DB 72 FB 17         [ 2]  294 	addw	x, (0x17, sp)
+      0000DE 1D 00 30         [ 2]  295 	subw	x, #0x0030
+      0000E1 1F 19            [ 2]  296 	ldw	(0x19, sp), x
+      0000E3                        297 00154$:
+      0000E3 0D 1B            [ 1]  298 	tnz	(0x1b, sp)
+      0000E5 27 07            [ 1]  299 	jreq	00155$
+      0000E7 AE 00 63         [ 2]  300 	ldw	x, #0x0063
+      0000EA 1F 15            [ 2]  301 	ldw	(0x15, sp), x
+      0000EC 20 24            [ 2]  302 	jra	00156$
+      0000EE                        303 00155$:
+      0000EE 5F               [ 1]  304 	clrw	x
+      0000EF 7B 2B            [ 1]  305 	ld	a, (0x2b, sp)
+      0000F1 97               [ 1]  306 	ld	xl, a
+      0000F2 1D 00 30         [ 2]  307 	subw	x, #0x0030
+      0000F5 89               [ 2]  308 	pushw	x
+      0000F6 58               [ 2]  309 	sllw	x
+      0000F7 58               [ 2]  310 	sllw	x
+      0000F8 72 FB 01         [ 2]  311 	addw	x, (1, sp)
+      0000FB 58               [ 2]  312 	sllw	x
+      0000FC 5B 02            [ 2]  313 	addw	sp, #2
+      0000FE 1F 35            [ 2]  314 	ldw	(0x35, sp), x
+      000100 1E 1C            [ 2]  315 	ldw	x, (0x1c, sp)
+      000102 E6 01            [ 1]  316 	ld	a, (0x1, x)
+      000104 5F               [ 1]  317 	clrw	x
+      000105 97               [ 1]  318 	ld	xl, a
+      000106 72 FB 35         [ 2]  319 	addw	x, (0x35, sp)
+      000109 1D 00 30         [ 2]  320 	subw	x, #0x0030
+      00010C 1F 33            [ 2]  321 	ldw	(0x33, sp), x
+      00010E 90 93            [ 1]  322 	ldw	y, x
+      000110 17 15            [ 2]  323 	ldw	(0x15, sp), y
+      000112                        324 00156$:
+      000112 AEr06r27         [ 2]  325 	ldw	x, #___str_1+0
+      000115 1F 0A            [ 2]  326 	ldw	(0x0a, sp), x
+      000117 F6               [ 1]  327 	ld	a, (x)
+      000118 6B 09            [ 1]  328 	ld	(0x09, sp), a
+      00011A 7B 09            [ 1]  329 	ld	a, (0x09, sp)
+      00011C A1 3F            [ 1]  330 	cp	a, #0x3f
+      00011E 26 06            [ 1]  331 	jrne	00431$
+      000120 A6 01            [ 1]  332 	ld	a, #0x01
+      000122 6B 11            [ 1]  333 	ld	(0x11, sp), a
+      000124 20 02            [ 2]  334 	jra	00432$
+      000126                        335 00431$:
+      000126 0F 11            [ 1]  336 	clr	(0x11, sp)
+      000128                        337 00432$:
+      000128 0D 11            [ 1]  338 	tnz	(0x11, sp)
+      00012A 27 07            [ 1]  339 	jreq	00157$
+      00012C AE 00 63         [ 2]  340 	ldw	x, #0x0063
+      00012F 1F 0F            [ 2]  341 	ldw	(0x0f, sp), x
+      000131 20 31            [ 2]  342 	jra	00158$
+      000133                        343 00157$:
+      000133 1E 0A            [ 2]  344 	ldw	x, (0x0a, sp)
+      000135 E6 04            [ 1]  345 	ld	a, (0x4, x)
+      000137 6B 14            [ 1]  346 	ld	(0x14, sp), a
+      000139 7B 14            [ 1]  347 	ld	a, (0x14, sp)
+      00013B A1 30            [ 1]  348 	cp	a, #0x30
+      00013D 25 14            [ 1]  349 	jrc	00159$
+      00013F 5F               [ 1]  350 	clrw	x
+      000140 7B 14            [ 1]  351 	ld	a, (0x14, sp)
+      000142 97               [ 1]  352 	ld	xl, a
+      000143 1D 00 30         [ 2]  353 	subw	x, #0x0030
+      000146 89               [ 2]  354 	pushw	x
+      000147 58               [ 2]  355 	sllw	x
+      000148 58               [ 2]  356 	sllw	x
+      000149 72 FB 01         [ 2]  357 	addw	x, (1, sp)
+      00014C 58               [ 2]  358 	sllw	x
+      00014D 5B 02            [ 2]  359 	addw	sp, #2
+      00014F 1F 12            [ 2]  360 	ldw	(0x12, sp), x
+      000151 20 03            [ 2]  361 	jra	00160$
+      000153                        362 00159$:
+      000153 5F               [ 1]  363 	clrw	x
+      000154 1F 12            [ 2]  364 	ldw	(0x12, sp), x
+      000156                        365 00160$:
+      000156 1E 0A            [ 2]  366 	ldw	x, (0x0a, sp)
+      000158 E6 05            [ 1]  367 	ld	a, (0x5, x)
+      00015A 5F               [ 1]  368 	clrw	x
+      00015B 97               [ 1]  369 	ld	xl, a
+      00015C 1D 00 30         [ 2]  370 	subw	x, #0x0030
+      00015F 72 FB 12         [ 2]  371 	addw	x, (0x12, sp)
+      000162 1F 0F            [ 2]  372 	ldw	(0x0f, sp), x
+      000164                        373 00158$:
+      000164 0D 11            [ 1]  374 	tnz	(0x11, sp)
+      000166 27 08            [ 1]  375 	jreq	00161$
+      000168 AE 00 63         [ 2]  376 	ldw	x, #0x0063
+      00016B 1F 0D            [ 2]  377 	ldw	(0x0d, sp), x
+      00016D CCr02r9C         [ 2]  378 	jp	00162$
+      000170                        379 00161$:
+      000170 7B 09            [ 1]  380 	ld	a, (0x09, sp)
+      000172 A1 4A            [ 1]  381 	cp	a, #0x4a
+      000174 26 06            [ 1]  382 	jrne	00437$
+      000176 A6 01            [ 1]  383 	ld	a, #0x01
+      000178 6B 0C            [ 1]  384 	ld	(0x0c, sp), a
+      00017A 20 02            [ 2]  385 	jra	00438$
+      00017C                        386 00437$:
+      00017C 0F 0C            [ 1]  387 	clr	(0x0c, sp)
+      00017E                        388 00438$:
+      00017E 1E 0A            [ 2]  389 	ldw	x, (0x0a, sp)
+      000180 5C               [ 1]  390 	incw	x
+      000181 1F 26            [ 2]  391 	ldw	(0x26, sp), x
+      000183 1E 0A            [ 2]  392 	ldw	x, (0x0a, sp)
+      000185 5C               [ 1]  393 	incw	x
+      000186 5C               [ 1]  394 	incw	x
+      000187 1F 24            [ 2]  395 	ldw	(0x24, sp), x
+      000189 0D 0C            [ 1]  396 	tnz	(0x0c, sp)
+      00018B 27 13            [ 1]  397 	jreq	00163$
+      00018D 1E 26            [ 2]  398 	ldw	x, (0x26, sp)
+      00018F F6               [ 1]  399 	ld	a, (x)
+      000190 A1 61            [ 1]  400 	cp	a, #0x61
+      000192 26 0C            [ 1]  401 	jrne	00163$
+      000194 1E 24            [ 2]  402 	ldw	x, (0x24, sp)
+      000196 F6               [ 1]  403 	ld	a, (x)
+      000197 A1 6E            [ 1]  404 	cp	a, #0x6e
+      000199 26 05            [ 1]  405 	jrne	00163$
+      00019B 5F               [ 1]  406 	clrw	x
+      00019C 5C               [ 1]  407 	incw	x
+      00019D CCr02r9A         [ 2]  408 	jp	00164$
+      0001A0                        409 00163$:
+      0001A0 7B 09            [ 1]  410 	ld	a, (0x09, sp)
+      0001A2 A1 46            [ 1]  411 	cp	a, #0x46
+      0001A4 26 08            [ 1]  412 	jrne	00171$
+      0001A6 AE 00 02         [ 2]  413 	ldw	x, #0x0002
+      0001A9 1F 29            [ 2]  414 	ldw	(0x29, sp), x
+      0001AB CCr02r98         [ 2]  415 	jp	00172$
+      0001AE                        416 00171$:
+      0001AE 7B 09            [ 1]  417 	ld	a, (0x09, sp)
+      0001B0 A1 4D            [ 1]  418 	cp	a, #0x4d
+      0001B2 26 06            [ 1]  419 	jrne	00450$
+      0001B4 A6 01            [ 1]  420 	ld	a, #0x01
+      0001B6 6B 28            [ 1]  421 	ld	(0x28, sp), a
+      0001B8 20 02            [ 2]  422 	jra	00451$
+      0001BA                        423 00450$:
+      0001BA 0F 28            [ 1]  424 	clr	(0x28, sp)
+      0001BC                        425 00451$:
+      0001BC 0D 28            [ 1]  426 	tnz	(0x28, sp)
+      0001BE 27 14            [ 1]  427 	jreq	00173$
+      0001C0 1E 26            [ 2]  428 	ldw	x, (0x26, sp)
+      0001C2 F6               [ 1]  429 	ld	a, (x)
+      0001C3 A1 61            [ 1]  430 	cp	a, #0x61
+      0001C5 26 0D            [ 1]  431 	jrne	00173$
+      0001C7 1E 24            [ 2]  432 	ldw	x, (0x24, sp)
+      0001C9 F6               [ 1]  433 	ld	a, (x)
+      0001CA A1 72            [ 1]  434 	cp	a, #0x72
+      0001CC 26 06            [ 1]  435 	jrne	00173$
+      0001CE AE 00 03         [ 2]  436 	ldw	x, #0x0003
+      0001D1 CCr02r96         [ 2]  437 	jp	00174$
+      0001D4                        438 00173$:
+      0001D4 7B 09            [ 1]  439 	ld	a, (0x09, sp)
+      0001D6 A1 41            [ 1]  440 	cp	a, #0x41
+      0001D8 26 06            [ 1]  441 	jrne	00460$
+      0001DA A6 01            [ 1]  442 	ld	a, #0x01
+      0001DC 6B 2E            [ 1]  443 	ld	(0x2e, sp), a
+      0001DE 20 02            [ 2]  444 	jra	00461$
+      0001E0                        445 00460$:
+      0001E0 0F 2E            [ 1]  446 	clr	(0x2e, sp)
+      0001E2                        447 00461$:
+      0001E2 0D 2E            [ 1]  448 	tnz	(0x2e, sp)
+      0001E4 27 0F            [ 1]  449 	jreq	00181$
+      0001E6 1E 26            [ 2]  450 	ldw	x, (0x26, sp)
+      0001E8 F6               [ 1]  451 	ld	a, (x)
+      0001E9 A1 70            [ 1]  452 	cp	a, #0x70
+      0001EB 26 08            [ 1]  453 	jrne	00181$
+      0001ED AE 00 04         [ 2]  454 	ldw	x, #0x0004
+      0001F0 1F 2C            [ 2]  455 	ldw	(0x2c, sp), x
+      0001F2 CCr02r94         [ 2]  456 	jp	00182$
+      0001F5                        457 00181$:
+      0001F5 0D 28            [ 1]  458 	tnz	(0x28, sp)
+      0001F7 27 16            [ 1]  459 	jreq	00186$
+      0001F9 1E 26            [ 2]  460 	ldw	x, (0x26, sp)
+      0001FB F6               [ 1]  461 	ld	a, (x)
+      0001FC A1 61            [ 1]  462 	cp	a, #0x61
+      0001FE 26 0F            [ 1]  463 	jrne	00186$
+      000200 1E 24            [ 2]  464 	ldw	x, (0x24, sp)
+      000202 F6               [ 1]  465 	ld	a, (x)
+      000203 A1 79            [ 1]  466 	cp	a, #0x79
+      000205 26 08            [ 1]  467 	jrne	00186$
+      000207 AE 00 05         [ 2]  468 	ldw	x, #0x0005
+      00020A 1F 31            [ 2]  469 	ldw	(0x31, sp), x
+      00020C CCr02r90         [ 2]  470 	jp	00187$
+      00020F                        471 00186$:
+      00020F 0D 0C            [ 1]  472 	tnz	(0x0c, sp)
+      000211 27 13            [ 1]  473 	jreq	00194$
+      000213 1E 26            [ 2]  474 	ldw	x, (0x26, sp)
+      000215 F6               [ 1]  475 	ld	a, (x)
+      000216 A1 75            [ 1]  476 	cp	a, #0x75
+      000218 26 0C            [ 1]  477 	jrne	00194$
+      00021A 1E 24            [ 2]  478 	ldw	x, (0x24, sp)
+      00021C F6               [ 1]  479 	ld	a, (x)
+      00021D A1 6E            [ 1]  480 	cp	a, #0x6e
+      00021F 26 05            [ 1]  481 	jrne	00194$
+      000221 AE 00 06         [ 2]  482 	ldw	x, #0x0006
+      000224 20 68            [ 2]  483 	jra	00195$
+      000226                        484 00194$:
+      000226 0D 0C            [ 1]  485 	tnz	(0x0c, sp)
+      000228 27 15            [ 1]  486 	jreq	00202$
+      00022A 1E 26            [ 2]  487 	ldw	x, (0x26, sp)
+      00022C F6               [ 1]  488 	ld	a, (x)
+      00022D A1 75            [ 1]  489 	cp	a, #0x75
+      00022F 26 0E            [ 1]  490 	jrne	00202$
+      000231 1E 24            [ 2]  491 	ldw	x, (0x24, sp)
+      000233 F6               [ 1]  492 	ld	a, (x)
+      000234 A1 6C            [ 1]  493 	cp	a, #0x6c
+      000236 26 07            [ 1]  494 	jrne	00202$
+      000238 AE 00 07         [ 2]  495 	ldw	x, #0x0007
+      00023B 1F 2F            [ 2]  496 	ldw	(0x2f, sp), x
+      00023D 20 4D            [ 2]  497 	jra	00203$
+      00023F                        498 00202$:
+      00023F 0D 2E            [ 1]  499 	tnz	(0x2e, sp)
+      000241 27 0C            [ 1]  500 	jreq	00210$
+      000243 1E 26            [ 2]  501 	ldw	x, (0x26, sp)
+      000245 F6               [ 1]  502 	ld	a, (x)
+      000246 A1 75            [ 1]  503 	cp	a, #0x75
+      000248 26 05            [ 1]  504 	jrne	00210$
+      00024A AE 00 08         [ 2]  505 	ldw	x, #0x0008
+      00024D 20 3B            [ 2]  506 	jra	00211$
+      00024F                        507 00210$:
+      00024F 7B 09            [ 1]  508 	ld	a, (0x09, sp)
+      000251 A1 53            [ 1]  509 	cp	a, #0x53
+      000253 26 07            [ 1]  510 	jrne	00215$
+      000255 AE 00 09         [ 2]  511 	ldw	x, #0x0009
+      000258 1F 39            [ 2]  512 	ldw	(0x39, sp), x
+      00025A 20 2C            [ 2]  513 	jra	00216$
+      00025C                        514 00215$:
+      00025C 7B 09            [ 1]  515 	ld	a, (0x09, sp)
+      00025E A1 4F            [ 1]  516 	cp	a, #0x4f
+      000260 26 05            [ 1]  517 	jrne	00217$
+      000262 AE 00 0A         [ 2]  518 	ldw	x, #0x000a
+      000265 20 1F            [ 2]  519 	jra	00218$
+      000267                        520 00217$:
+      000267 7B 09            [ 1]  521 	ld	a, (0x09, sp)
+      000269 A1 4E            [ 1]  522 	cp	a, #0x4e
+      00026B 26 07            [ 1]  523 	jrne	00219$
+      00026D AE 00 0B         [ 2]  524 	ldw	x, #0x000b
+      000270 1F 37            [ 2]  525 	ldw	(0x37, sp), x
+      000272 20 10            [ 2]  526 	jra	00220$
+      000274                        527 00219$:
+      000274 7B 09            [ 1]  528 	ld	a, (0x09, sp)
+      000276 A1 44            [ 1]  529 	cp	a, #0x44
+      000278 26 05            [ 1]  530 	jrne	00221$
+      00027A AE 00 0C         [ 2]  531 	ldw	x, #0x000c
+      00027D 20 03            [ 2]  532 	jra	00222$
+      00027F                        533 00221$:
+      00027F AE 00 63         [ 2]  534 	ldw	x, #0x0063
+      000282                        535 00222$:
+      000282 1F 37            [ 2]  536 	ldw	(0x37, sp), x
+      000284                        537 00220$:
+      000284 1E 37            [ 2]  538 	ldw	x, (0x37, sp)
+      000286                        539 00218$:
+      000286 1F 39            [ 2]  540 	ldw	(0x39, sp), x
+      000288                        541 00216$:
+      000288 1E 39            [ 2]  542 	ldw	x, (0x39, sp)
+      00028A                        543 00211$:
+      00028A 1F 2F            [ 2]  544 	ldw	(0x2f, sp), x
+      00028C                        545 00203$:
+      00028C 1E 2F            [ 2]  546 	ldw	x, (0x2f, sp)
+      00028E                        547 00195$:
+      00028E 1F 31            [ 2]  548 	ldw	(0x31, sp), x
+      000290                        549 00187$:
+      000290 16 31            [ 2]  550 	ldw	y, (0x31, sp)
+      000292 17 2C            [ 2]  551 	ldw	(0x2c, sp), y
+      000294                        552 00182$:
+      000294 1E 2C            [ 2]  553 	ldw	x, (0x2c, sp)
+      000296                        554 00174$:
+      000296 1F 29            [ 2]  555 	ldw	(0x29, sp), x
+      000298                        556 00172$:
+      000298 1E 29            [ 2]  557 	ldw	x, (0x29, sp)
+      00029A                        558 00164$:
+      00029A 1F 0D            [ 2]  559 	ldw	(0x0d, sp), x
+      00029C                        560 00162$:
+      00029C 0D 11            [ 1]  561 	tnz	(0x11, sp)
+      00029E 27 05            [ 1]  562 	jreq	00223$
+      0002A0 AE 00 63         [ 2]  563 	ldw	x, #0x0063
+      0002A3 20 52            [ 2]  564 	jra	00224$
+      0002A5                        565 00223$:
+      0002A5 1E 0A            [ 2]  566 	ldw	x, (0x0a, sp)
+      0002A7 E6 07            [ 1]  567 	ld	a, (0x7, x)
+      0002A9 5F               [ 1]  568 	clrw	x
+      0002AA 97               [ 1]  569 	ld	xl, a
+      0002AB 1D 00 30         [ 2]  570 	subw	x, #0x0030
+      0002AE 89               [ 2]  571 	pushw	x
+      0002AF 4B E8            [ 1]  572 	push	#0xe8
+      0002B1 4B 03            [ 1]  573 	push	#0x03
+      0002B3 CDr00r00         [ 4]  574 	call	__mulint
+      0002B6 5B 04            [ 2]  575 	addw	sp, #4
+      0002B8 1F 3D            [ 2]  576 	ldw	(0x3d, sp), x
+      0002BA 1E 0A            [ 2]  577 	ldw	x, (0x0a, sp)
+      0002BC E6 08            [ 1]  578 	ld	a, (0x8, x)
+      0002BE 5F               [ 1]  579 	clrw	x
+      0002BF 97               [ 1]  580 	ld	xl, a
+      0002C0 1D 00 30         [ 2]  581 	subw	x, #0x0030
+      0002C3 89               [ 2]  582 	pushw	x
+      0002C4 4B 64            [ 1]  583 	push	#0x64
+      0002C6 4B 00            [ 1]  584 	push	#0x00
+      0002C8 CDr00r00         [ 4]  585 	call	__mulint
+      0002CB 5B 04            [ 2]  586 	addw	sp, #4
+      0002CD 72 FB 3D         [ 2]  587 	addw	x, (0x3d, sp)
+      0002D0 1F 3B            [ 2]  588 	ldw	(0x3b, sp), x
+      0002D2 1E 0A            [ 2]  589 	ldw	x, (0x0a, sp)
+      0002D4 E6 09            [ 1]  590 	ld	a, (0x9, x)
+      0002D6 5F               [ 1]  591 	clrw	x
+      0002D7 97               [ 1]  592 	ld	xl, a
+      0002D8 1D 00 30         [ 2]  593 	subw	x, #0x0030
+      0002DB 89               [ 2]  594 	pushw	x
+      0002DC 58               [ 2]  595 	sllw	x
+      0002DD 58               [ 2]  596 	sllw	x
+      0002DE 72 FB 01         [ 2]  597 	addw	x, (1, sp)
+      0002E1 58               [ 2]  598 	sllw	x
+      0002E2 5B 02            [ 2]  599 	addw	sp, #2
+      0002E4 72 FB 3B         [ 2]  600 	addw	x, (0x3b, sp)
+      0002E7 1F 41            [ 2]  601 	ldw	(0x41, sp), x
+      0002E9 1E 0A            [ 2]  602 	ldw	x, (0x0a, sp)
+      0002EB E6 0A            [ 1]  603 	ld	a, (0xa, x)
+      0002ED 5F               [ 1]  604 	clrw	x
+      0002EE 97               [ 1]  605 	ld	xl, a
+      0002EF 1D 00 30         [ 2]  606 	subw	x, #0x0030
+      0002F2 72 FB 41         [ 2]  607 	addw	x, (0x41, sp)
+      0002F5 1F 3F            [ 2]  608 	ldw	(0x3f, sp), x
+      0002F7                        609 00224$:
+      0002F7 1D 07 D0         [ 2]  610 	subw	x, #0x07d0
+      0002FA 1F 49            [ 2]  611 	ldw	(0x49, sp), x
+      0002FC AEr06r11         [ 2]  612 	ldw	x, #___str_0+0
+      0002FF 1F 47            [ 2]  613 	ldw	(0x47, sp), x
+      000301 AEr00r06         [ 2]  614 	ldw	x, #_version+0
+      000304 1F 4D            [ 2]  615 	ldw	(0x4d, sp), x
+      000306 90 93            [ 1]  616 	ldw	y, x
+      000308 1E 19            [ 2]  617 	ldw	x, (0x19, sp)
+      00030A 89               [ 2]  618 	pushw	x
+      00030B 1E 17            [ 2]  619 	ldw	x, (0x17, sp)
+      00030D 89               [ 2]  620 	pushw	x
+      00030E 1E 13            [ 2]  621 	ldw	x, (0x13, sp)
+      000310 89               [ 2]  622 	pushw	x
+      000311 1E 13            [ 2]  623 	ldw	x, (0x13, sp)
+      000313 89               [ 2]  624 	pushw	x
+      000314 1E 51            [ 2]  625 	ldw	x, (0x51, sp)
+      000316 89               [ 2]  626 	pushw	x
+      000317 1E 51            [ 2]  627 	ldw	x, (0x51, sp)
+      000319 89               [ 2]  628 	pushw	x
+      00031A 90 89            [ 2]  629 	pushw	y
+      00031C CDr00r00         [ 4]  630 	call	_sprintf
+      00031F 5B 0E            [ 2]  631 	addw	sp, #14
+                                    632 ;	../src/main.c: 103: disableInterrupts();
+      000321 9B               [ 1]  633 	sim
+                                    634 ;	../src/main.c: 104: InitialiseSystemClock();
+      000322 CDr00r0A         [ 4]  635 	call	_InitialiseSystemClock
+                                    636 ;	../src/main.c: 106: GPIOD->CR2 &= (uint8_t)(~(GPIO_PIN_4));
+      000325 72 19 50 13      [ 1]  637 	bres	20499, #4
+                                    638 ;	../src/main.c: 107: GPIOD->ODR &= (uint8_t)(~(GPIO_PIN_4));
+      000329 72 19 50 0F      [ 1]  639 	bres	20495, #4
+                                    640 ;	../src/main.c: 108: GPIOD->DDR |= (uint8_t)GPIO_PIN_4;
+      00032D 72 18 50 11      [ 1]  641 	bset	20497, #4
+                                    642 ;	../src/main.c: 109: GPIOD->CR1 |= (uint8_t)GPIO_PIN_4;
+      000331 72 18 50 12      [ 1]  643 	bset	20498, #4
+                                    644 ;	../src/main.c: 110: GPIOD->CR2 |= (uint8_t)GPIO_PIN_4;
+      000335 72 18 50 13      [ 1]  645 	bset	20499, #4
+                                    646 ;	../src/main.c: 114: GPIOD->DDR &= ~(GPIO_PIN_2 | GPIO_PIN_1);  // input mode
+      000339 C6 50 11         [ 1]  647 	ld	a, 0x5011
+      00033C A4 F9            [ 1]  648 	and	a, #0xf9
+      00033E C7 50 11         [ 1]  649 	ld	0x5011, a
+                                    650 ;	../src/main.c: 115: GPIOD->CR1 |= (GPIO_PIN_1 | GPIO_PIN_2);  // pull-ups
+      000341 C6 50 12         [ 1]  651 	ld	a, 0x5012
+      000344 AA 06            [ 1]  652 	or	a, #0x06
+      000346 C7 50 12         [ 1]  653 	ld	0x5012, a
+                                    654 ;	../src/main.c: 116: GPIOD->CR2 &= ~(GPIO_PIN_2 | GPIO_PIN_1);  // no interrupts
+      000349 C6 50 13         [ 1]  655 	ld	a, 0x5013
+      00034C A4 F9            [ 1]  656 	and	a, #0xf9
+      00034E C7 50 13         [ 1]  657 	ld	0x5013, a
+                                    658 ;	../src/main.c: 117: GPIOC->DDR &= ~(GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7); //  input mode
+      000351 C6 50 0C         [ 1]  659 	ld	a, 0x500c
+      000354 A4 0F            [ 1]  660 	and	a, #0x0f
+      000356 C7 50 0C         [ 1]  661 	ld	0x500c, a
+                                    662 ;	../src/main.c: 118: GPIOC->CR1 |= (GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);  // no interrupts
+      000359 C6 50 0D         [ 1]  663 	ld	a, 0x500d
+      00035C AA F0            [ 1]  664 	or	a, #0xf0
+      00035E C7 50 0D         [ 1]  665 	ld	0x500d, a
+                                    666 ;	../src/main.c: 119: GPIOC->CR2 &= ~(GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);  // no interrupts
+      000361 C6 50 0E         [ 1]  667 	ld	a, 0x500e
+      000364 A4 0F            [ 1]  668 	and	a, #0x0f
+      000366 C7 50 0E         [ 1]  669 	ld	0x500e, a
+                                    670 ;	../src/main.c: 122: rs485xmit_off();
+      000369 72 19 50 0F      [ 1]  671 	bres	20495, #4
+                                    672 ;	../src/main.c: 123: CFG->GCR |= 1; // disable SWIM
+      00036D C6 7F 60         [ 1]  673 	ld	a, 0x7f60
+      000370 5F               [ 1]  674 	clrw	x
+      000371 97               [ 1]  675 	ld	xl, a
+      000372 54               [ 2]  676 	srlw	x
+      000373 99               [ 1]  677 	scf
+      000374 59               [ 2]  678 	rlcw	x
+      000375 9F               [ 1]  679 	ld	a, xl
+      000376 C7 7F 60         [ 1]  680 	ld	0x7f60, a
+                                    681 ;	../src/main.c: 126: TIM4->PSCR = 7;   // prescaler
+      000379 35 07 53 47      [ 1]  682 	mov	0x5347+0, #0x07
+                                    683 ;	../src/main.c: 127: TIM4->ARR = 125;  // auto reload register
+      00037D 35 7D 53 48      [ 1]  684 	mov	0x5348+0, #0x7d
+                                    685 ;	../src/main.c: 129: TIM4->IER = TIM4_IER_UIE;
+      000381 35 01 53 43      [ 1]  686 	mov	0x5343+0, #0x01
+                                    687 ;	../src/main.c: 131: TIM4->CR1 = TIM4_CR1_ARPE | TIM4_CR1_URS | TIM4_CR1_CEN;
+      000385 35 85 53 40      [ 1]  688 	mov	0x5340+0, #0x85
+                                    689 ;	../src/main.c: 133: Global_time = 0L;
+      000389 5F               [ 1]  690 	clrw	x
+      00038A CFu00u02         [ 2]  691 	ldw	_Global_time+2, x
+      00038D CFu00u00         [ 2]  692 	ldw	_Global_time+0, x
+                                    693 ;	../src/main.c: 134: uart_init();		// initialize the uart functions - 9600 8-N-1 through RS485
+      000390 CDr00r00         [ 4]  694 	call	_uart_init
+                                    695 ;	../src/main.c: 136: enableInterrupts();
+      000393 9A               [ 1]  696 	rim
+                                    697 ;	../src/main.c: 138: address = 'S';		// this devices id character
+      000394 35 53u00u05      [ 1]  698 	mov	_address+0, #0x53
+                                    699 ;	../src/main.c: 140: ADC_init();			// initialize the analog read function
+      000398 CDr00r88         [ 4]  700 	call	_ADC_init
+                                    701 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      00039B 5F               [ 1]  702 	clrw	x
+      00039C 1F 65            [ 2]  703 	ldw	(0x65, sp), x
+      00039E 1F 63            [ 2]  704 	ldw	(0x63, sp), x
+      0003A0                        705 00135$:
+      0003A0 1E 65            [ 2]  706 	ldw	x, (0x65, sp)
+      0003A2 A3 D7 00         [ 2]  707 	cpw	x, #0xd700
+      0003A5 7B 64            [ 1]  708 	ld	a, (0x64, sp)
+      0003A7 A2 0A            [ 1]  709 	sbc	a, #0x0a
+      0003A9 7B 63            [ 1]  710 	ld	a, (0x63, sp)
+      0003AB A2 00            [ 1]  711 	sbc	a, #0x00
+      0003AD 24 17            [ 1]  712 	jrnc	00125$
+                                    713 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 14: __asm__("nop");
+      0003AF 9D               [ 1]  714 	nop
+                                    715 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      0003B0 16 65            [ 2]  716 	ldw	y, (0x65, sp)
+      0003B2 72 A9 00 01      [ 2]  717 	addw	y, #0x0001
+      0003B6 7B 64            [ 1]  718 	ld	a, (0x64, sp)
+      0003B8 A9 00            [ 1]  719 	adc	a, #0x00
+      0003BA 97               [ 1]  720 	ld	xl, a
+      0003BB 7B 63            [ 1]  721 	ld	a, (0x63, sp)
+      0003BD A9 00            [ 1]  722 	adc	a, #0x00
+      0003BF 95               [ 1]  723 	ld	xh, a
+      0003C0 17 65            [ 2]  724 	ldw	(0x65, sp), y
+      0003C2 1F 63            [ 2]  725 	ldw	(0x63, sp), x
+      0003C4 20 DA            [ 2]  726 	jra	00135$
+                                    727 ;	../src/main.c: 141: delay_ms(800);
+      0003C6                        728 00125$:
+                                    729 ;	../src/main.c: 142: rs485xmit_on();	// turn the RS485 chips transmitter on
+      0003C6 C6 50 0F         [ 1]  730 	ld	a, 0x500f
+      0003C9 AA 10            [ 1]  731 	or	a, #0x10
+      0003CB C7 50 0F         [ 1]  732 	ld	0x500f, a
+                                    733 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      0003CE 5F               [ 1]  734 	clrw	x
+      0003CF 1F 61            [ 2]  735 	ldw	(0x61, sp), x
+      0003D1 1F 5F            [ 2]  736 	ldw	(0x5f, sp), x
+      0003D3                        737 00138$:
+      0003D3 1E 61            [ 2]  738 	ldw	x, (0x61, sp)
+      0003D5 A3 68 10         [ 2]  739 	cpw	x, #0x6810
+      0003D8 7B 60            [ 1]  740 	ld	a, (0x60, sp)
+      0003DA A2 00            [ 1]  741 	sbc	a, #0x00
+      0003DC 7B 5F            [ 1]  742 	ld	a, (0x5f, sp)
+      0003DE A2 00            [ 1]  743 	sbc	a, #0x00
+      0003E0 24 17            [ 1]  744 	jrnc	00127$
+                                    745 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 14: __asm__("nop");
+      0003E2 9D               [ 1]  746 	nop
+                                    747 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      0003E3 16 61            [ 2]  748 	ldw	y, (0x61, sp)
+      0003E5 72 A9 00 01      [ 2]  749 	addw	y, #0x0001
+      0003E9 7B 60            [ 1]  750 	ld	a, (0x60, sp)
+      0003EB A9 00            [ 1]  751 	adc	a, #0x00
+      0003ED 97               [ 1]  752 	ld	xl, a
+      0003EE 7B 5F            [ 1]  753 	ld	a, (0x5f, sp)
+      0003F0 A9 00            [ 1]  754 	adc	a, #0x00
+      0003F2 95               [ 1]  755 	ld	xh, a
+      0003F3 17 61            [ 2]  756 	ldw	(0x61, sp), y
+      0003F5 1F 5F            [ 2]  757 	ldw	(0x5f, sp), x
+      0003F7 20 DA            [ 2]  758 	jra	00138$
+                                    759 ;	../src/main.c: 143: delay_ms(30);
+      0003F9                        760 00127$:
+                                    761 ;	../src/main.c: 144: printf("%c:Running:%s:%02x\r\n",address,version,address);
+      0003F9 5F               [ 1]  762 	clrw	x
+      0003FA C6u00u05         [ 1]  763 	ld	a, _address+0
+      0003FD 97               [ 1]  764 	ld	xl, a
+      0003FE 16 4D            [ 2]  765 	ldw	y, (0x4d, sp)
+      000400 17 4B            [ 2]  766 	ldw	(0x4b, sp), y
+      000402 90 AEr06r3C      [ 2]  767 	ldw	y, #___str_3+0
+      000406 89               [ 2]  768 	pushw	x
+      000407 7B 4E            [ 1]  769 	ld	a, (0x4e, sp)
+      000409 88               [ 1]  770 	push	a
+      00040A 7B 4E            [ 1]  771 	ld	a, (0x4e, sp)
+      00040C 88               [ 1]  772 	push	a
+      00040D 89               [ 2]  773 	pushw	x
+      00040E 90 89            [ 2]  774 	pushw	y
+      000410 CDr00r00         [ 4]  775 	call	_printf
+      000413 5B 08            [ 2]  776 	addw	sp, #8
+                                    777 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      000415 5F               [ 1]  778 	clrw	x
+      000416 1F 5D            [ 2]  779 	ldw	(0x5d, sp), x
+      000418 1F 5B            [ 2]  780 	ldw	(0x5b, sp), x
+      00041A                        781 00141$:
+      00041A 1E 5D            [ 2]  782 	ldw	x, (0x5d, sp)
+      00041C A3 22 B0         [ 2]  783 	cpw	x, #0x22b0
+      00041F 7B 5C            [ 1]  784 	ld	a, (0x5c, sp)
+      000421 A2 00            [ 1]  785 	sbc	a, #0x00
+      000423 7B 5B            [ 1]  786 	ld	a, (0x5b, sp)
+      000425 A2 00            [ 1]  787 	sbc	a, #0x00
+      000427 24 17            [ 1]  788 	jrnc	00129$
+                                    789 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 14: __asm__("nop");
+      000429 9D               [ 1]  790 	nop
+                                    791 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      00042A 16 5D            [ 2]  792 	ldw	y, (0x5d, sp)
+      00042C 72 A9 00 01      [ 2]  793 	addw	y, #0x0001
+      000430 7B 5C            [ 1]  794 	ld	a, (0x5c, sp)
+      000432 A9 00            [ 1]  795 	adc	a, #0x00
+      000434 97               [ 1]  796 	ld	xl, a
+      000435 7B 5B            [ 1]  797 	ld	a, (0x5b, sp)
+      000437 A9 00            [ 1]  798 	adc	a, #0x00
+      000439 95               [ 1]  799 	ld	xh, a
+      00043A 17 5D            [ 2]  800 	ldw	(0x5d, sp), y
+      00043C 1F 5B            [ 2]  801 	ldw	(0x5b, sp), x
+      00043E 20 DA            [ 2]  802 	jra	00141$
+                                    803 ;	../src/main.c: 145: delay_ms(10);
+      000440                        804 00129$:
+                                    805 ;	../src/main.c: 146: rs485xmit_off(); // turn the transmitter back off
+      000440 C6 50 0F         [ 1]  806 	ld	a, 0x500f
+      000443 A4 EF            [ 1]  807 	and	a, #0xef
+      000445 C7 50 0F         [ 1]  808 	ld	0x500f, a
+                                    809 ;	../src/main.c: 147: InitialiseIWDG();
+      000448 CDr00r48         [ 4]  810 	call	_InitialiseIWDG
+                                    811 ;	../src/main.c: 148: reset_watchdog();  // reset the watchdog timer
+      00044B 35 AA 50 E0      [ 1]  812 	mov	0x50e0+0, #0xaa
+                                    813 ;	../src/main.c: 151: do{
+      00044F                        814 00121$:
+                                    815 ;	../src/main.c: 152: reset_watchdog();  // reset the watchdog timer
+      00044F 35 AA 50 E0      [ 1]  816 	mov	0x50e0+0, #0xaa
+                                    817 ;	../src/main.c: 153: if(UART_read_byte(&rb)){ // buffer isn't empty
+      000453 96               [ 1]  818 	ldw	x, sp
+      000454 5C               [ 1]  819 	incw	x
+      000455 89               [ 2]  820 	pushw	x
+      000456 CDr00r00         [ 4]  821 	call	_UART_read_byte
+      000459 5B 02            [ 2]  822 	addw	sp, #2
+      00045B 4D               [ 1]  823 	tnz	a
+      00045C 26 03            [ 1]  824 	jrne	00507$
+      00045E CCr05rD8         [ 2]  825 	jp	00117$
+      000461                        826 00507$:
+                                    827 ;	../src/main.c: 154: switch(rb){
+      000461 7B 01            [ 1]  828 	ld	a, (0x01, sp)
+      000463 A1 1B            [ 1]  829 	cp	a, #0x1b
+      000465 26 11            [ 1]  830 	jrne	00102$
+                                    831 ;	../src/main.c: 156: esc = 1;
+      000467 35 01u00u04      [ 1]  832 	mov	_esc+0, #0x01
+                                    833 ;	../src/main.c: 157: esc_time = Global_time;	// only wait two seconds for the next character after the escape
+      00046B CEu00u02         [ 2]  834 	ldw	x, _Global_time+2
+      00046E 1F 6C            [ 2]  835 	ldw	(0x6c, sp), x
+      000470 CEu00u00         [ 2]  836 	ldw	x, _Global_time+0
+      000473 1F 6A            [ 2]  837 	ldw	(0x6a, sp), x
+                                    838 ;	../src/main.c: 158: break;
+      000475 CCr05rD8         [ 2]  839 	jp	00117$
+                                    840 ;	../src/main.c: 159: default:
+      000478                        841 00102$:
+                                    842 ;	../src/main.c: 160: if (rb == address && esc)  // address must match the switches read by mcp23017
+      000478 7B 01            [ 1]  843 	ld	a, (0x01, sp)
+      00047A C1u00u05         [ 1]  844 	cp	a, _address+0
+      00047D 27 03            [ 1]  845 	jreq	00513$
+      00047F CCr05rD4         [ 2]  846 	jp	00113$
+      000482                        847 00513$:
+      000482 72 5Du00u04      [ 1]  848 	tnz	_esc+0
+      000486 26 03            [ 1]  849 	jrne	00514$
+      000488 CCr05rD4         [ 2]  850 	jp	00113$
+      00048B                        851 00514$:
+                                    852 ;	../src/main.c: 162: Global_time = 0L;   // when was the last time we were called?
+      00048B 5F               [ 1]  853 	clrw	x
+      00048C CFu00u02         [ 2]  854 	ldw	_Global_time+2, x
+      00048F CFu00u00         [ 2]  855 	ldw	_Global_time+0, x
+                                    856 ;	../src/main.c: 163: voltage = ADC_read();	// get the analog value from the pressure sensor
+      000492 CDr00r5D         [ 4]  857 	call	_ADC_read
+                                    858 ;	../src/main.c: 164: if (voltage < VOLTAGE_OFFSET)		// the sensor range is from 0.5 volts to 4.5 volts
+      000495 1F 67            [ 2]  859 	ldw	(0x67, sp), x
+      000497 A3 00 78         [ 2]  860 	cpw	x, #0x0078
+      00049A 24 05            [ 1]  861 	jrnc	00104$
+                                    862 ;	../src/main.c: 165: voltage = VOLTAGE_OFFSET;
+      00049C AE 00 78         [ 2]  863 	ldw	x, #0x0078
+      00049F 1F 67            [ 2]  864 	ldw	(0x67, sp), x
+      0004A1                        865 00104$:
+                                    866 ;	../src/main.c: 166: PSI = (uint16_t)((voltage - VOLTAGE_OFFSET) * 1.15);  // formula to calculate PSI
+      0004A1 1E 67            [ 2]  867 	ldw	x, (0x67, sp)
+      0004A3 1D 00 78         [ 2]  868 	subw	x, #0x0078
+      0004A6 89               [ 2]  869 	pushw	x
+      0004A7 CDr00r00         [ 4]  870 	call	___uint2fs
+      0004AA 5B 02            [ 2]  871 	addw	sp, #2
+      0004AC 89               [ 2]  872 	pushw	x
+      0004AD 90 89            [ 2]  873 	pushw	y
+      0004AF 4B 33            [ 1]  874 	push	#0x33
+      0004B1 4B 33            [ 1]  875 	push	#0x33
+      0004B3 4B 93            [ 1]  876 	push	#0x93
+      0004B5 4B 3F            [ 1]  877 	push	#0x3f
+      0004B7 CDr00r00         [ 4]  878 	call	___fsmul
+      0004BA 5B 08            [ 2]  879 	addw	sp, #8
+      0004BC 89               [ 2]  880 	pushw	x
+      0004BD 90 89            [ 2]  881 	pushw	y
+      0004BF CDr00r00         [ 4]  882 	call	___fs2uint
+      0004C2 5B 04            [ 2]  883 	addw	sp, #4
+                                    884 ;	../src/main.c: 168: psi1 = (uint16_t)(PSI / 100);
+      0004C4 1F 72            [ 2]  885 	ldw	(0x72, sp), x
+      0004C6 90 AE 00 64      [ 2]  886 	ldw	y, #0x0064
+      0004CA 65               [ 2]  887 	divw	x, y
+                                    888 ;	../src/main.c: 169: psi2 = (uint16_t)(PSI - (psi1 * 100));
+      0004CB 1F 70            [ 2]  889 	ldw	(0x70, sp), x
+      0004CD 89               [ 2]  890 	pushw	x
+      0004CE 4B 64            [ 1]  891 	push	#0x64
+      0004D0 4B 00            [ 1]  892 	push	#0x00
+      0004D2 CDr00r00         [ 4]  893 	call	__mulint
+      0004D5 5B 04            [ 2]  894 	addw	sp, #4
+      0004D7 1F 51            [ 2]  895 	ldw	(0x51, sp), x
+      0004D9 1E 72            [ 2]  896 	ldw	x, (0x72, sp)
+      0004DB 72 F0 51         [ 2]  897 	subw	x, (0x51, sp)
+      0004DE 1F 6E            [ 2]  898 	ldw	(0x6e, sp), x
+                                    899 ;	../src/main.c: 170: strcpy(s,"0000aa");
+      0004E0 90 AEr06r51      [ 2]  900 	ldw	y, #___str_4+0
+      0004E4 96               [ 1]  901 	ldw	x, sp
+      0004E5 5C               [ 1]  902 	incw	x
+      0004E6 5C               [ 1]  903 	incw	x
+      0004E7 1F 4F            [ 2]  904 	ldw	(0x4f, sp), x
+      0004E9 90 89            [ 2]  905 	pushw	y
+      0004EB 89               [ 2]  906 	pushw	x
+      0004EC CDr00r00         [ 4]  907 	call	_strcpy
+      0004EF 5B 04            [ 2]  908 	addw	sp, #4
+                                    909 ;	../src/main.c: 171: for (i = 0; i < 4; i++)		// read through the on-off inputs
+      0004F1 0F 69            [ 1]  910 	clr	(0x69, sp)
+      0004F3                        911 00143$:
+                                    912 ;	../src/main.c: 173: if (!(GPIOC->IDR & (GPIO_PIN_4 << i)))
+      0004F3 C6 50 0B         [ 1]  913 	ld	a, 0x500b
+      0004F6 88               [ 1]  914 	push	a
+      0004F7 AE 00 10         [ 2]  915 	ldw	x, #0x0010
+      0004FA 7B 6A            [ 1]  916 	ld	a, (0x6a, sp)
+      0004FC 27 04            [ 1]  917 	jreq	00517$
+      0004FE                        918 00516$:
+      0004FE 58               [ 2]  919 	sllw	x
+      0004FF 4A               [ 1]  920 	dec	a
+      000500 26 FC            [ 1]  921 	jrne	00516$
+      000502                        922 00517$:
+      000502 84               [ 1]  923 	pop	a
+      000503 6B 46            [ 1]  924 	ld	(0x46, sp), a
+      000505 0F 45            [ 1]  925 	clr	(0x45, sp)
+      000507 9F               [ 1]  926 	ld	a, xl
+      000508 14 46            [ 1]  927 	and	a, (0x46, sp)
+      00050A 6B 44            [ 1]  928 	ld	(0x44, sp), a
+      00050C 9E               [ 1]  929 	ld	a, xh
+      00050D 14 45            [ 1]  930 	and	a, (0x45, sp)
+      00050F 6B 43            [ 1]  931 	ld	(0x43, sp), a
+      000511 1E 43            [ 2]  932 	ldw	x, (0x43, sp)
+      000513 26 0E            [ 1]  933 	jrne	00144$
+                                    934 ;	../src/main.c: 174: s[i] = '1';		// if the gpio is low, that means on
+      000515 7B 69            [ 1]  935 	ld	a, (0x69, sp)
+      000517 1B 50            [ 1]  936 	add	a, (0x50, sp)
+      000519 88               [ 1]  937 	push	a
+      00051A 4F               [ 1]  938 	clr	a
+      00051B 19 50            [ 1]  939 	adc	a, (0x50, sp)
+      00051D 95               [ 1]  940 	ld	xh, a
+      00051E 84               [ 1]  941 	pop	a
+      00051F 97               [ 1]  942 	ld	xl, a
+      000520 A6 31            [ 1]  943 	ld	a, #0x31
+      000522 F7               [ 1]  944 	ld	(x), a
+      000523                        945 00144$:
+                                    946 ;	../src/main.c: 171: for (i = 0; i < 4; i++)		// read through the on-off inputs
+      000523 0C 69            [ 1]  947 	inc	(0x69, sp)
+      000525 7B 69            [ 1]  948 	ld	a, (0x69, sp)
+      000527 A1 04            [ 1]  949 	cp	a, #0x04
+      000529 25 C8            [ 1]  950 	jrc	00143$
+                                    951 ;	../src/main.c: 176: if (!(GPIOD->IDR & GPIO_PIN_1))	// these are for the air conditioners
+      00052B C6 50 10         [ 1]  952 	ld	a, 0x5010
+      00052E A5 02            [ 1]  953 	bcp	a, #0x02
+      000530 26 08            [ 1]  954 	jrne	00109$
+                                    955 ;	../src/main.c: 177: s[4] = 'A';
+      000532 1E 4F            [ 2]  956 	ldw	x, (0x4f, sp)
+      000534 1C 00 04         [ 2]  957 	addw	x, #0x0004
+      000537 A6 41            [ 1]  958 	ld	a, #0x41
+      000539 F7               [ 1]  959 	ld	(x), a
+      00053A                        960 00109$:
+                                    961 ;	../src/main.c: 178: if (!(GPIOD->IDR & GPIO_PIN_2))
+      00053A C6 50 10         [ 1]  962 	ld	a, 0x5010
+      00053D A5 04            [ 1]  963 	bcp	a, #0x04
+      00053F 26 06            [ 1]  964 	jrne	00111$
+                                    965 ;	../src/main.c: 179: s[5] = 'A';
+      000541 1E 4F            [ 2]  966 	ldw	x, (0x4f, sp)
+      000543 A6 41            [ 1]  967 	ld	a, #0x41
+      000545 E7 05            [ 1]  968 	ld	(0x0005, x), a
+      000547                        969 00111$:
+                                    970 ;	../src/main.c: 180: s[6] = 0;		// terminate the string
+      000547 1E 4F            [ 2]  971 	ldw	x, (0x4f, sp)
+      000549 1C 00 06         [ 2]  972 	addw	x, #0x0006
+      00054C 7F               [ 1]  973 	clr	(x)
+                                    974 ;	../src/main.c: 181: rs485xmit_on();	// turn the RS485 chips transmitter on
+      00054D C6 50 0F         [ 1]  975 	ld	a, 0x500f
+      000550 AA 10            [ 1]  976 	or	a, #0x10
+      000552 C7 50 0F         [ 1]  977 	ld	0x500f, a
+                                    978 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      000555 5F               [ 1]  979 	clrw	x
+      000556 1F 59            [ 2]  980 	ldw	(0x59, sp), x
+      000558 1F 57            [ 2]  981 	ldw	(0x57, sp), x
+      00055A                        982 00146$:
+      00055A 1E 59            [ 2]  983 	ldw	x, (0x59, sp)
+      00055C A3 68 10         [ 2]  984 	cpw	x, #0x6810
+      00055F 7B 58            [ 1]  985 	ld	a, (0x58, sp)
+      000561 A2 00            [ 1]  986 	sbc	a, #0x00
+      000563 7B 57            [ 1]  987 	ld	a, (0x57, sp)
+      000565 A2 00            [ 1]  988 	sbc	a, #0x00
+      000567 24 17            [ 1]  989 	jrnc	00131$
+                                    990 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 14: __asm__("nop");
+      000569 9D               [ 1]  991 	nop
+                                    992 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      00056A 16 59            [ 2]  993 	ldw	y, (0x59, sp)
+      00056C 72 A9 00 01      [ 2]  994 	addw	y, #0x0001
+      000570 7B 58            [ 1]  995 	ld	a, (0x58, sp)
+      000572 A9 00            [ 1]  996 	adc	a, #0x00
+      000574 97               [ 1]  997 	ld	xl, a
+      000575 7B 57            [ 1]  998 	ld	a, (0x57, sp)
+      000577 A9 00            [ 1]  999 	adc	a, #0x00
+      000579 95               [ 1] 1000 	ld	xh, a
+      00057A 17 59            [ 2] 1001 	ldw	(0x59, sp), y
+      00057C 1F 57            [ 2] 1002 	ldw	(0x57, sp), x
+      00057E 20 DA            [ 2] 1003 	jra	00146$
+                                   1004 ;	../src/main.c: 182: delay_ms(30);	// make sure transmitter has time to turn on
+      000580                       1005 00131$:
+                                   1006 ;	../src/main.c: 183: printf("%c:%02d.%02d:%05d:%s:\r\n", address,psi1,psi2,voltage,s); // S:23.56:89012:0101Aa:
+      000580 1E 4F            [ 2] 1007 	ldw	x, (0x4f, sp)
+      000582 C6u00u05         [ 1] 1008 	ld	a, _address+0
+      000585 6B 23            [ 1] 1009 	ld	(0x23, sp), a
+      000587 0F 22            [ 1] 1010 	clr	(0x22, sp)
+      000589 90 AEr06r58      [ 2] 1011 	ldw	y, #___str_5+0
+      00058D 89               [ 2] 1012 	pushw	x
+      00058E 1E 69            [ 2] 1013 	ldw	x, (0x69, sp)
+      000590 89               [ 2] 1014 	pushw	x
+      000591 1E 72            [ 2] 1015 	ldw	x, (0x72, sp)
+      000593 89               [ 2] 1016 	pushw	x
+      000594 1E 76            [ 2] 1017 	ldw	x, (0x76, sp)
+      000596 89               [ 2] 1018 	pushw	x
+      000597 1E 2A            [ 2] 1019 	ldw	x, (0x2a, sp)
+      000599 89               [ 2] 1020 	pushw	x
+      00059A 90 89            [ 2] 1021 	pushw	y
+      00059C CDr00r00         [ 4] 1022 	call	_printf
+      00059F 5B 0C            [ 2] 1023 	addw	sp, #12
+                                   1024 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      0005A1 5F               [ 1] 1025 	clrw	x
+      0005A2 1F 55            [ 2] 1026 	ldw	(0x55, sp), x
+      0005A4 1F 53            [ 2] 1027 	ldw	(0x53, sp), x
+      0005A6                       1028 00149$:
+      0005A6 1E 55            [ 2] 1029 	ldw	x, (0x55, sp)
+      0005A8 A3 22 B0         [ 2] 1030 	cpw	x, #0x22b0
+      0005AB 7B 54            [ 1] 1031 	ld	a, (0x54, sp)
+      0005AD A2 00            [ 1] 1032 	sbc	a, #0x00
+      0005AF 7B 53            [ 1] 1033 	ld	a, (0x53, sp)
+      0005B1 A2 00            [ 1] 1034 	sbc	a, #0x00
+      0005B3 24 17            [ 1] 1035 	jrnc	00133$
+                                   1036 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 14: __asm__("nop");
+      0005B5 9D               [ 1] 1037 	nop
+                                   1038 ;	/home/scott/projects-stm8/pvcc-steam/inc/delay.h: 13: for (i = 0; i < ((F_CPU / 18 / 1000UL) * ms); i++) {
+      0005B6 16 55            [ 2] 1039 	ldw	y, (0x55, sp)
+      0005B8 72 A9 00 01      [ 2] 1040 	addw	y, #0x0001
+      0005BC 7B 54            [ 1] 1041 	ld	a, (0x54, sp)
+      0005BE A9 00            [ 1] 1042 	adc	a, #0x00
+      0005C0 97               [ 1] 1043 	ld	xl, a
+      0005C1 7B 53            [ 1] 1044 	ld	a, (0x53, sp)
+      0005C3 A9 00            [ 1] 1045 	adc	a, #0x00
+      0005C5 95               [ 1] 1046 	ld	xh, a
+      0005C6 17 55            [ 2] 1047 	ldw	(0x55, sp), y
+      0005C8 1F 53            [ 2] 1048 	ldw	(0x53, sp), x
+      0005CA 20 DA            [ 2] 1049 	jra	00149$
+                                   1050 ;	../src/main.c: 184: delay_ms(10);	// give it time to transmit before turning transmitter off
+      0005CC                       1051 00133$:
+                                   1052 ;	../src/main.c: 185: rs485xmit_off(); // turn the transmitter back off
+      0005CC C6 50 0F         [ 1] 1053 	ld	a, 0x500f
+      0005CF A4 EF            [ 1] 1054 	and	a, #0xef
+      0005D1 C7 50 0F         [ 1] 1055 	ld	0x500f, a
+      0005D4                       1056 00113$:
+                                   1057 ;	../src/main.c: 187: esc = 0;	// reset the flag for the escape character
+      0005D4 72 5Fu00u04      [ 1] 1058 	clr	_esc+0
+                                   1059 ;	../src/main.c: 188: }
+      0005D8                       1060 00117$:
+                                   1061 ;	../src/main.c: 190: if (esc && (Global_time - esc_time > 2000))  // give it 2 seconds to send the id character
+      0005D8 72 5Du00u04      [ 1] 1062 	tnz	_esc+0
+      0005DC 26 03            [ 1] 1063 	jrne	00524$
+      0005DE CCr04r4F         [ 2] 1064 	jp	00121$
+      0005E1                       1065 00524$:
+      0005E1 CEu00u02         [ 2] 1066 	ldw	x, _Global_time+2
+      0005E4 72 F0 6C         [ 2] 1067 	subw	x, (0x6c, sp)
+      0005E7 1F 20            [ 2] 1068 	ldw	(0x20, sp), x
+      0005E9 C6u00u01         [ 1] 1069 	ld	a, _Global_time+1
+      0005EC 12 6B            [ 1] 1070 	sbc	a, (0x6b, sp)
+      0005EE 6B 1F            [ 1] 1071 	ld	(0x1f, sp), a
+      0005F0 C6u00u00         [ 1] 1072 	ld	a, _Global_time+0
+      0005F3 12 6A            [ 1] 1073 	sbc	a, (0x6a, sp)
+      0005F5 6B 1E            [ 1] 1074 	ld	(0x1e, sp), a
+      0005F7 AE 07 D0         [ 2] 1075 	ldw	x, #0x07d0
+      0005FA 13 20            [ 2] 1076 	cpw	x, (0x20, sp)
+      0005FC 4F               [ 1] 1077 	clr	a
+      0005FD 12 1F            [ 1] 1078 	sbc	a, (0x1f, sp)
+      0005FF 4F               [ 1] 1079 	clr	a
+      000600 12 1E            [ 1] 1080 	sbc	a, (0x1e, sp)
+      000602 25 03            [ 1] 1081 	jrc	00525$
+      000604 CCr04r4F         [ 2] 1082 	jp	00121$
+      000607                       1083 00525$:
+                                   1084 ;	../src/main.c: 191: esc = 0;  // reset the esc flag, since it should have been followed by the id right away
+      000607 72 5Fu00u04      [ 1] 1085 	clr	_esc+0
+                                   1086 ;	../src/main.c: 192: }while(1);
+      00060B CCr04r4F         [ 2] 1087 	jp	00121$
+                                   1088 ;	../src/main.c: 193: }
+      00060E 5B 73            [ 2] 1089 	addw	sp, #115
+      000610 81               [ 4] 1090 	ret
+                                   1091 	.area CODE
+      000611                       1092 ___str_0:
+      000611 25 30 32 64 25 30 32  1093 	.ascii "%02d%02d%02d-%02d%02d"
+             64 25 30 32 64 2D 25
+             30 32 64 25 30 32 64
+      000626 00                    1094 	.db 0x00
+      000627                       1095 ___str_1:
+      000627 4F 63 74 20 20 35 20  1096 	.ascii "Oct  5 2018"
+             32 30 31 38
+      000632 00                    1097 	.db 0x00
+      000633                       1098 ___str_2:
+      000633 31 37 3A 31 37 3A 34  1099 	.ascii "17:17:40"
+             30
+      00063B 00                    1100 	.db 0x00
+      00063C                       1101 ___str_3:
+      00063C 25 63 3A 52 75 6E 6E  1102 	.ascii "%c:Running:%s:%02x"
+             69 6E 67 3A 25 73 3A
+             25 30 32 78
+      00064E 0D                    1103 	.db 0x0d
+      00064F 0A                    1104 	.db 0x0a
+      000650 00                    1105 	.db 0x00
+      000651                       1106 ___str_4:
+      000651 30 30 30 30 61 61     1107 	.ascii "0000aa"
+      000657 00                    1108 	.db 0x00
+      000658                       1109 ___str_5:
+      000658 25 63 3A 25 30 32 64  1110 	.ascii "%c:%02d.%02d:%05d:%s:"
+             2E 25 30 32 64 3A 25
+             30 35 64 3A 25 73 3A
+      00066D 0D                    1111 	.db 0x0d
+      00066E 0A                    1112 	.db 0x0a
+      00066F 00                    1113 	.db 0x00
+                                   1114 	.area INITIALIZER
+                                   1115 	.area CABS (ABS)

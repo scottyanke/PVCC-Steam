@@ -1,0 +1,238 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.7.0 #10231 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module interrupts
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _TLI_IRQHandler
+                                     12 	.globl _AWU_IRQHandler
+                                     13 	.globl _CLK_IRQHandler
+                                     14 	.globl _EXTI_PORTA_IRQHandler
+                                     15 	.globl _EXTI_PORTB_IRQHandler
+                                     16 	.globl _EXTI_PORTC_IRQHandler
+                                     17 	.globl _EXTI_PORTD_IRQHandler
+                                     18 	.globl _EXTI_PORTE_IRQHandler
+                                     19 	.globl _SPI_IRQHandler
+                                     20 	.globl _TIM1_UPD_OVF_TRG_BRK_IRQHandler
+                                     21 	.globl _TIM1_CAP_COM_IRQHandler
+                                     22 	.globl _TIM2_UPD_OVF_BRK_IRQHandler
+                                     23 	.globl _TIM2_CAP_COM_IRQHandler
+                                     24 	.globl _UART1_TX_IRQHandler
+                                     25 	.globl _UART1_RX_IRQHandler
+                                     26 	.globl _I2C_IRQHandler
+                                     27 	.globl _ADC1_IRQHandler
+                                     28 	.globl _TIM4_UPD_OVF_IRQHandler
+                                     29 	.globl _EEPROM_EEC_IRQHandler
+                                     30 ;--------------------------------------------------------
+                                     31 ; ram data
+                                     32 ;--------------------------------------------------------
+                                     33 	.area DATA
+                                     34 ;--------------------------------------------------------
+                                     35 ; ram data
+                                     36 ;--------------------------------------------------------
+                                     37 	.area INITIALIZED
+                                     38 ;--------------------------------------------------------
+                                     39 ; absolute external ram data
+                                     40 ;--------------------------------------------------------
+                                     41 	.area DABS (ABS)
+                                     42 ;--------------------------------------------------------
+                                     43 ; global & static initialisations
+                                     44 ;--------------------------------------------------------
+                                     45 	.area HOME
+                                     46 	.area GSINIT
+                                     47 	.area GSFINAL
+                                     48 	.area GSINIT
+                                     49 ;--------------------------------------------------------
+                                     50 ; Home
+                                     51 ;--------------------------------------------------------
+                                     52 	.area HOME
+                                     53 	.area HOME
+                                     54 ;--------------------------------------------------------
+                                     55 ; code
+                                     56 ;--------------------------------------------------------
+                                     57 	.area CODE
+                                     58 ;	../src/interrupts.c: 26: INTERRUPT_HANDLER(TLI_IRQHandler, 0){}
+                                     59 ;	-----------------------------------------
+                                     60 ;	 function TLI_IRQHandler
+                                     61 ;	-----------------------------------------
+      000000                         62 _TLI_IRQHandler:
+      000000 80               [11]   63 	iret
+                                     64 ;	../src/interrupts.c: 29: INTERRUPT_HANDLER(AWU_IRQHandler, 1){}
+                                     65 ;	-----------------------------------------
+                                     66 ;	 function AWU_IRQHandler
+                                     67 ;	-----------------------------------------
+      000001                         68 _AWU_IRQHandler:
+      000001 80               [11]   69 	iret
+                                     70 ;	../src/interrupts.c: 32: INTERRUPT_HANDLER(CLK_IRQHandler, 2){}
+                                     71 ;	-----------------------------------------
+                                     72 ;	 function CLK_IRQHandler
+                                     73 ;	-----------------------------------------
+      000002                         74 _CLK_IRQHandler:
+      000002 80               [11]   75 	iret
+                                     76 ;	../src/interrupts.c: 35: INTERRUPT_HANDLER(EXTI_PORTA_IRQHandler, 3){}
+                                     77 ;	-----------------------------------------
+                                     78 ;	 function EXTI_PORTA_IRQHandler
+                                     79 ;	-----------------------------------------
+      000003                         80 _EXTI_PORTA_IRQHandler:
+      000003 80               [11]   81 	iret
+                                     82 ;	../src/interrupts.c: 38: INTERRUPT_HANDLER(EXTI_PORTB_IRQHandler, 4){}
+                                     83 ;	-----------------------------------------
+                                     84 ;	 function EXTI_PORTB_IRQHandler
+                                     85 ;	-----------------------------------------
+      000004                         86 _EXTI_PORTB_IRQHandler:
+      000004 80               [11]   87 	iret
+                                     88 ;	../src/interrupts.c: 41: INTERRUPT_HANDLER(EXTI_PORTC_IRQHandler, 5){
+                                     89 ;	-----------------------------------------
+                                     90 ;	 function EXTI_PORTC_IRQHandler
+                                     91 ;	-----------------------------------------
+      000005                         92 _EXTI_PORTC_IRQHandler:
+                                     93 ;	../src/interrupts.c: 42: }
+      000005 80               [11]   94 	iret
+                                     95 ;	../src/interrupts.c: 45: INTERRUPT_HANDLER(EXTI_PORTD_IRQHandler, 6){
+                                     96 ;	-----------------------------------------
+                                     97 ;	 function EXTI_PORTD_IRQHandler
+                                     98 ;	-----------------------------------------
+      000006                         99 _EXTI_PORTD_IRQHandler:
+                                    100 ;	../src/interrupts.c: 46: }
+      000006 80               [11]  101 	iret
+                                    102 ;	../src/interrupts.c: 49: INTERRUPT_HANDLER(EXTI_PORTE_IRQHandler, 7){}
+                                    103 ;	-----------------------------------------
+                                    104 ;	 function EXTI_PORTE_IRQHandler
+                                    105 ;	-----------------------------------------
+      000007                        106 _EXTI_PORTE_IRQHandler:
+      000007 80               [11]  107 	iret
+                                    108 ;	../src/interrupts.c: 65: INTERRUPT_HANDLER(SPI_IRQHandler, 10){}
+                                    109 ;	-----------------------------------------
+                                    110 ;	 function SPI_IRQHandler
+                                    111 ;	-----------------------------------------
+      000008                        112 _SPI_IRQHandler:
+      000008 80               [11]  113 	iret
+                                    114 ;	../src/interrupts.c: 68: INTERRUPT_HANDLER(TIM1_UPD_OVF_TRG_BRK_IRQHandler, 11){
+                                    115 ;	-----------------------------------------
+                                    116 ;	 function TIM1_UPD_OVF_TRG_BRK_IRQHandler
+                                    117 ;	-----------------------------------------
+      000009                        118 _TIM1_UPD_OVF_TRG_BRK_IRQHandler:
+                                    119 ;	../src/interrupts.c: 69: }
+      000009 80               [11]  120 	iret
+                                    121 ;	../src/interrupts.c: 72: INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12){}
+                                    122 ;	-----------------------------------------
+                                    123 ;	 function TIM1_CAP_COM_IRQHandler
+                                    124 ;	-----------------------------------------
+      00000A                        125 _TIM1_CAP_COM_IRQHandler:
+      00000A 80               [11]  126 	iret
+                                    127 ;	../src/interrupts.c: 84: INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13){
+                                    128 ;	-----------------------------------------
+                                    129 ;	 function TIM2_UPD_OVF_BRK_IRQHandler
+                                    130 ;	-----------------------------------------
+      00000B                        131 _TIM2_UPD_OVF_BRK_IRQHandler:
+                                    132 ;	../src/interrupts.c: 85: }
+      00000B 80               [11]  133 	iret
+                                    134 ;	../src/interrupts.c: 89: INTERRUPT_HANDLER(TIM2_CAP_COM_IRQHandler, 14){
+                                    135 ;	-----------------------------------------
+                                    136 ;	 function TIM2_CAP_COM_IRQHandler
+                                    137 ;	-----------------------------------------
+      00000C                        138 _TIM2_CAP_COM_IRQHandler:
+                                    139 ;	../src/interrupts.c: 90: }
+      00000C 80               [11]  140 	iret
+                                    141 ;	../src/interrupts.c: 105: INTERRUPT_HANDLER(UART1_TX_IRQHandler, 17){}
+                                    142 ;	-----------------------------------------
+                                    143 ;	 function UART1_TX_IRQHandler
+                                    144 ;	-----------------------------------------
+      00000D                        145 _UART1_TX_IRQHandler:
+      00000D 80               [11]  146 	iret
+                                    147 ;	../src/interrupts.c: 108: INTERRUPT_HANDLER(UART1_RX_IRQHandler, 18){
+                                    148 ;	-----------------------------------------
+                                    149 ;	 function UART1_RX_IRQHandler
+                                    150 ;	-----------------------------------------
+      00000E                        151 _UART1_RX_IRQHandler:
+      00000E 52 02            [ 2]  152 	sub	sp, #2
+                                    153 ;	../src/interrupts.c: 110: if(UART1->SR & UART1_SR_RXNE){ // data received
+      000010 C6 52 30         [ 1]  154 	ld	a, 0x5230
+      000013 A5 20            [ 1]  155 	bcp	a, #0x20
+      000015 27 3A            [ 1]  156 	jreq	00115$
+                                    157 ;	../src/interrupts.c: 111: rb = UART1->DR; // read received byte & clear RXNE flag
+      000017 C6 52 31         [ 1]  158 	ld	a, 0x5231
+                                    159 ;	../src/interrupts.c: 113: UART_rx[UART_rx_cur_i++] = rb; // put received byte into cycled buffer
+      00001A AEr00r00         [ 2]  160 	ldw	x, #_UART_rx+0
+      00001D 1F 01            [ 2]  161 	ldw	(0x01, sp), x
+      00001F 41               [ 1]  162 	exg	a, xl
+      000020 C6u00u00         [ 1]  163 	ld	a, _UART_rx_cur_i+0
+      000023 41               [ 1]  164 	exg	a, xl
+      000024 72 5Cu00u00      [ 1]  165 	inc	_UART_rx_cur_i+0
+      000028 02               [ 1]  166 	rlwa	x
+      000029 4F               [ 1]  167 	clr	a
+      00002A 01               [ 1]  168 	rrwa	x
+      00002B 72 FB 01         [ 2]  169 	addw	x, (0x01, sp)
+      00002E F7               [ 1]  170 	ld	(x), a
+                                    171 ;	../src/interrupts.c: 114: if(UART_rx_cur_i == UART_rx_start_i){ // Oops: buffer overflow! Just forget old data
+      00002F C6u00u00         [ 1]  172 	ld	a, _UART_rx_start_i+0
+      000032 C1u00u00         [ 1]  173 	cp	a, _UART_rx_cur_i+0
+      000035 26 0F            [ 1]  174 	jrne	00110$
+                                    175 ;	../src/interrupts.c: 115: UART_rx_start_i++;
+      000037 72 5Cu00u00      [ 1]  176 	inc	_UART_rx_start_i+0
+                                    177 ;	../src/interrupts.c: 116: check_UART_pointer(UART_rx_start_i);
+      00003B C6u00u00         [ 1]  178 	ld	a, _UART_rx_start_i+0
+      00003E A1 1E            [ 1]  179 	cp	a, #0x1e
+      000040 26 04            [ 1]  180 	jrne	00110$
+      000042 72 5Fu00u00      [ 1]  181 	clr	_UART_rx_start_i+0
+                                    182 ;	../src/interrupts.c: 118: check_UART_pointer(UART_rx_cur_i);
+      000046                        183 00110$:
+      000046 C6u00u00         [ 1]  184 	ld	a, _UART_rx_cur_i+0
+      000049 A1 1E            [ 1]  185 	cp	a, #0x1e
+      00004B 26 04            [ 1]  186 	jrne	00115$
+      00004D 72 5Fu00u00      [ 1]  187 	clr	_UART_rx_cur_i+0
+      000051                        188 00115$:
+                                    189 ;	../src/interrupts.c: 120: }
+      000051 5B 02            [ 2]  190 	addw	sp, #2
+      000053 80               [11]  191 	iret
+                                    192 ;	../src/interrupts.c: 124: INTERRUPT_HANDLER(I2C_IRQHandler, 19){}
+                                    193 ;	-----------------------------------------
+                                    194 ;	 function I2C_IRQHandler
+                                    195 ;	-----------------------------------------
+      000054                        196 _I2C_IRQHandler:
+      000054 80               [11]  197 	iret
+                                    198 ;	../src/interrupts.c: 148: INTERRUPT_HANDLER(ADC1_IRQHandler, 22){
+                                    199 ;	-----------------------------------------
+                                    200 ;	 function ADC1_IRQHandler
+                                    201 ;	-----------------------------------------
+      000055                        202 _ADC1_IRQHandler:
+                                    203 ;	../src/interrupts.c: 150: }
+      000055 80               [11]  204 	iret
+                                    205 ;	../src/interrupts.c: 158: void TIM4_UPD_OVF_IRQHandler() __interrupt(23){
+                                    206 ;	-----------------------------------------
+                                    207 ;	 function TIM4_UPD_OVF_IRQHandler
+                                    208 ;	-----------------------------------------
+      000056                        209 _TIM4_UPD_OVF_IRQHandler:
+                                    210 ;	../src/interrupts.c: 159: if(TIM4->SR1 & TIM4_SR1_UIF){ // update interrupt
+      000056 C6 53 44         [ 1]  211 	ld	a, 0x5344
+      000059 44               [ 1]  212 	srl	a
+      00005A 24 1B            [ 1]  213 	jrnc	00102$
+                                    214 ;	../src/interrupts.c: 160: Global_time++; // increase timer
+      00005C CEu00u02         [ 2]  215 	ldw	x, _Global_time+2
+      00005F 1C 00 01         [ 2]  216 	addw	x, #0x0001
+      000062 C6u00u01         [ 1]  217 	ld	a, _Global_time+1
+      000065 A9 00            [ 1]  218 	adc	a, #0x00
+      000067 90 97            [ 1]  219 	ld	yl, a
+      000069 C6u00u00         [ 1]  220 	ld	a, _Global_time+0
+      00006C A9 00            [ 1]  221 	adc	a, #0x00
+      00006E 90 95            [ 1]  222 	ld	yh, a
+      000070 CFu00u02         [ 2]  223 	ldw	_Global_time+2, x
+      000073 90 CFu00u00      [ 2]  224 	ldw	_Global_time+0, y
+      000077                        225 00102$:
+                                    226 ;	../src/interrupts.c: 162: TIM4->SR1 = 0; // clear all interrupt flags
+      000077 35 00 53 44      [ 1]  227 	mov	0x5344+0, #0x00
+                                    228 ;	../src/interrupts.c: 163: }
+      00007B 80               [11]  229 	iret
+                                    230 ;	../src/interrupts.c: 167: INTERRUPT_HANDLER(EEPROM_EEC_IRQHandler, 24){}
+                                    231 ;	-----------------------------------------
+                                    232 ;	 function EEPROM_EEC_IRQHandler
+                                    233 ;	-----------------------------------------
+      00007C                        234 _EEPROM_EEC_IRQHandler:
+      00007C 80               [11]  235 	iret
+                                    236 	.area CODE
+                                    237 	.area INITIALIZER
+                                    238 	.area CABS (ABS)

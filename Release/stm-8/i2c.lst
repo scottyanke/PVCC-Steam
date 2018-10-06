@@ -1,0 +1,250 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.6.0 #9615 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module i2c
+                                      6 	.optsdcc -mstm8
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _i2c_init
+                                     12 	.globl _i2c_clear
+                                     13 	.globl _i2c_start
+                                     14 	.globl _i2c_stop
+                                     15 	.globl _i2c_write
+                                     16 	.globl _i2c_write_addr
+                                     17 	.globl _i2c_read
+                                     18 	.globl _i2c_read_arr
+                                     19 ;--------------------------------------------------------
+                                     20 ; ram data
+                                     21 ;--------------------------------------------------------
+                                     22 	.area DATA
+                                     23 ;--------------------------------------------------------
+                                     24 ; ram data
+                                     25 ;--------------------------------------------------------
+                                     26 	.area INITIALIZED
+                                     27 ;--------------------------------------------------------
+                                     28 ; absolute external ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area DABS (ABS)
+                                     31 ;--------------------------------------------------------
+                                     32 ; global & static initialisations
+                                     33 ;--------------------------------------------------------
+                                     34 	.area HOME
+                                     35 	.area GSINIT
+                                     36 	.area GSFINAL
+                                     37 	.area GSINIT
+                                     38 ;--------------------------------------------------------
+                                     39 ; Home
+                                     40 ;--------------------------------------------------------
+                                     41 	.area HOME
+                                     42 	.area HOME
+                                     43 ;--------------------------------------------------------
+                                     44 ; code
+                                     45 ;--------------------------------------------------------
+                                     46 	.area CODE
+                                     47 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 4: void i2c_init() {
+                                     48 ;	-----------------------------------------
+                                     49 ;	 function i2c_init
+                                     50 ;	-----------------------------------------
+      000000                         51 _i2c_init:
+                                     52 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 5: I2C_FREQR = (1 << I2C_FREQR_FREQ1);
+      000000 35 02 52 12      [ 1]   53 	mov	0x5212+0, #0x02
+                                     54 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 6: I2C_CCRL = 0x0A; // 100kHz
+      000004 35 0A 52 1B      [ 1]   55 	mov	0x521b+0, #0x0a
+                                     56 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 7: I2C_OARH = (1 << I2C_OARH_ADDMODE); // 7-bit addressing
+      000008 35 80 52 14      [ 1]   57 	mov	0x5214+0, #0x80
+                                     58 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 8: I2C_CR1 = (1 << I2C_CR1_PE);
+      00000C 35 01 52 10      [ 1]   59 	mov	0x5210+0, #0x01
+      000010 81               [ 4]   60 	ret
+                                     61 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 11: void i2c_clear() {
+                                     62 ;	-----------------------------------------
+                                     63 ;	 function i2c_clear
+                                     64 ;	-----------------------------------------
+      000011                         65 _i2c_clear:
+                                     66 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 12: (void) I2C_SR1;
+      000011 AE 52 17         [ 2]   67 	ldw	x, #0x5217
+      000014 F6               [ 1]   68 	ld	a, (x)
+                                     69 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 13: I2C_DR = 0x00;
+      000015 35 00 52 16      [ 1]   70 	mov	0x5216+0, #0x00
+      000019 81               [ 4]   71 	ret
+                                     72 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 16: void i2c_start() {
+                                     73 ;	-----------------------------------------
+                                     74 ;	 function i2c_start
+                                     75 ;	-----------------------------------------
+      00001A                         76 _i2c_start:
+                                     77 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 18: I2C_CR2 |= (1 << I2C_CR2_START);
+      00001A 72 10 52 11      [ 1]   78 	bset	0x5211, #0
+                                     79 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 19: i = 0;
+      00001E 4F               [ 1]   80 	clr	a
+                                     81 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 20: while (!(I2C_SR1 & (1 << I2C_SR1_SB)) && i < 200)
+      00001F                         82 00102$:
+      00001F AE 52 17         [ 2]   83 	ldw	x, #0x5217
+      000022 88               [ 1]   84 	push	a
+      000023 F6               [ 1]   85 	ld	a, (x)
+      000024 97               [ 1]   86 	ld	xl, a
+      000025 84               [ 1]   87 	pop	a
+      000026 54               [ 2]   88 	srlw	x
+      000027 24 01            [ 1]   89 	jrnc	00119$
+      000029 81               [ 4]   90 	ret
+      00002A                         91 00119$:
+      00002A A1 C8            [ 1]   92 	cp	a, #0xc8
+      00002C 25 01            [ 1]   93 	jrc	00120$
+      00002E 81               [ 4]   94 	ret
+      00002F                         95 00120$:
+                                     96 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 21: i++;
+      00002F 4C               [ 1]   97 	inc	a
+      000030 20 ED            [ 2]   98 	jra	00102$
+      000032 81               [ 4]   99 	ret
+                                    100 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 24: void i2c_stop() {
+                                    101 ;	-----------------------------------------
+                                    102 ;	 function i2c_stop
+                                    103 ;	-----------------------------------------
+      000033                        104 _i2c_stop:
+                                    105 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 25: I2C_CR2 |= (1 << I2C_CR2_STOP);
+      000033 AE 52 11         [ 2]  106 	ldw	x, #0x5211
+      000036 F6               [ 1]  107 	ld	a, (x)
+      000037 AA 02            [ 1]  108 	or	a, #0x02
+      000039 F7               [ 1]  109 	ld	(x), a
+                                    110 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 26: while (I2C_SR3 & (1 << I2C_SR3_MSL));
+      00003A                        111 00101$:
+      00003A AE 52 19         [ 2]  112 	ldw	x, #0x5219
+      00003D F6               [ 1]  113 	ld	a, (x)
+      00003E 44               [ 1]  114 	srl	a
+      00003F 25 F9            [ 1]  115 	jrc	00101$
+      000041 81               [ 4]  116 	ret
+                                    117 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 29: void i2c_write(uint8_t data) {
+                                    118 ;	-----------------------------------------
+                                    119 ;	 function i2c_write
+                                    120 ;	-----------------------------------------
+      000042                        121 _i2c_write:
+                                    122 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 31: I2C_DR = data;
+      000042 AE 52 16         [ 2]  123 	ldw	x, #0x5216
+      000045 7B 03            [ 1]  124 	ld	a, (0x03, sp)
+      000047 F7               [ 1]  125 	ld	(x), a
+                                    126 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 32: i = 0;
+      000048 4F               [ 1]  127 	clr	a
+                                    128 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 33: while (!(I2C_SR1 & (1 << I2C_SR1_TXE)) && i < 200)
+      000049                        129 00102$:
+      000049 AE 52 17         [ 2]  130 	ldw	x, #0x5217
+      00004C 88               [ 1]  131 	push	a
+      00004D F6               [ 1]  132 	ld	a, (x)
+      00004E 95               [ 1]  133 	ld	xh, a
+      00004F 84               [ 1]  134 	pop	a
+      000050 5D               [ 2]  135 	tnzw	x
+      000051 2A 01            [ 1]  136 	jrpl	00119$
+      000053 81               [ 4]  137 	ret
+      000054                        138 00119$:
+      000054 A1 C8            [ 1]  139 	cp	a, #0xc8
+      000056 25 01            [ 1]  140 	jrc	00120$
+      000058 81               [ 4]  141 	ret
+      000059                        142 00120$:
+                                    143 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 34: i++;
+      000059 4C               [ 1]  144 	inc	a
+      00005A 20 ED            [ 2]  145 	jra	00102$
+      00005C 81               [ 4]  146 	ret
+                                    147 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 37: void i2c_write_addr(uint8_t addr) {
+                                    148 ;	-----------------------------------------
+                                    149 ;	 function i2c_write_addr
+                                    150 ;	-----------------------------------------
+      00005D                        151 _i2c_write_addr:
+                                    152 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 39: I2C_DR = addr;
+      00005D AE 52 16         [ 2]  153 	ldw	x, #0x5216
+      000060 7B 03            [ 1]  154 	ld	a, (0x03, sp)
+      000062 F7               [ 1]  155 	ld	(x), a
+                                    156 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 40: i = 0;
+      000063 4F               [ 1]  157 	clr	a
+      000064 97               [ 1]  158 	ld	xl, a
+                                    159 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 41: while (!(I2C_SR1 & (1 << I2C_SR1_ADDR)) && i < 200)
+      000065                        160 00102$:
+      000065 90 AE 52 17      [ 2]  161 	ldw	y, #0x5217
+      000069 90 F6            [ 1]  162 	ld	a, (y)
+      00006B A5 02            [ 1]  163 	bcp	a, #0x02
+      00006D 26 08            [ 1]  164 	jrne	00104$
+      00006F 9F               [ 1]  165 	ld	a, xl
+      000070 A1 C8            [ 1]  166 	cp	a, #0xc8
+      000072 24 03            [ 1]  167 	jrnc	00104$
+                                    168 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 42: i++;;
+      000074 5C               [ 2]  169 	incw	x
+      000075 20 EE            [ 2]  170 	jra	00102$
+      000077                        171 00104$:
+                                    172 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 43: (void) I2C_SR3; // check BUS_BUSY
+      000077 AE 52 19         [ 2]  173 	ldw	x, #0x5219
+      00007A F6               [ 1]  174 	ld	a, (x)
+                                    175 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 44: I2C_CR2 |= (1 << I2C_CR2_ACK);
+      00007B AE 52 11         [ 2]  176 	ldw	x, #0x5211
+      00007E F6               [ 1]  177 	ld	a, (x)
+      00007F AA 04            [ 1]  178 	or	a, #0x04
+      000081 F7               [ 1]  179 	ld	(x), a
+      000082 81               [ 4]  180 	ret
+                                    181 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 47: uint8_t i2c_read() {
+                                    182 ;	-----------------------------------------
+                                    183 ;	 function i2c_read
+                                    184 ;	-----------------------------------------
+      000083                        185 _i2c_read:
+                                    186 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 48: I2C_CR2 &= ~(1 << I2C_CR2_ACK);
+      000083 AE 52 11         [ 2]  187 	ldw	x, #0x5211
+      000086 F6               [ 1]  188 	ld	a, (x)
+      000087 A4 FB            [ 1]  189 	and	a, #0xfb
+      000089 F7               [ 1]  190 	ld	(x), a
+                                    191 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 49: i2c_stop();
+      00008A CDr00r33         [ 4]  192 	call	_i2c_stop
+                                    193 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 50: while (!(I2C_SR1 & (1 << I2C_SR1_RXNE)));
+      00008D                        194 00101$:
+      00008D AE 52 17         [ 2]  195 	ldw	x, #0x5217
+      000090 F6               [ 1]  196 	ld	a, (x)
+      000091 A5 40            [ 1]  197 	bcp	a, #0x40
+      000093 27 F8            [ 1]  198 	jreq	00101$
+                                    199 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 51: return I2C_DR;
+      000095 AE 52 16         [ 2]  200 	ldw	x, #0x5216
+      000098 F6               [ 1]  201 	ld	a, (x)
+      000099 81               [ 4]  202 	ret
+                                    203 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 54: void i2c_read_arr(uint8_t *buf, int len) {
+                                    204 ;	-----------------------------------------
+                                    205 ;	 function i2c_read_arr
+                                    206 ;	-----------------------------------------
+      00009A                        207 _i2c_read_arr:
+      00009A 52 02            [ 2]  208 	sub	sp, #2
+                                    209 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 55: while (len-- > 1) {
+      00009C                        210 00104$:
+      00009C 16 07            [ 2]  211 	ldw	y, (0x07, sp)
+      00009E 17 01            [ 2]  212 	ldw	(0x01, sp), y
+      0000A0 1E 01            [ 2]  213 	ldw	x, (0x01, sp)
+      0000A2 5A               [ 2]  214 	decw	x
+      0000A3 1F 07            [ 2]  215 	ldw	(0x07, sp), x
+                                    216 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 58: *(buf++) = I2C_DR;
+      0000A5 16 05            [ 2]  217 	ldw	y, (0x05, sp)
+                                    218 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 55: while (len-- > 1) {
+      0000A7 1E 01            [ 2]  219 	ldw	x, (0x01, sp)
+      0000A9 A3 00 01         [ 2]  220 	cpw	x, #0x0001
+      0000AC 2D 1B            [ 1]  221 	jrsle	00106$
+                                    222 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 56: I2C_CR2 |= (1 << I2C_CR2_ACK);
+      0000AE AE 52 11         [ 2]  223 	ldw	x, #0x5211
+      0000B1 F6               [ 1]  224 	ld	a, (x)
+      0000B2 AA 04            [ 1]  225 	or	a, #0x04
+      0000B4 F7               [ 1]  226 	ld	(x), a
+                                    227 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 57: while (!(I2C_SR1 & (1 << I2C_SR1_RXNE)));
+      0000B5                        228 00101$:
+      0000B5 AE 52 17         [ 2]  229 	ldw	x, #0x5217
+      0000B8 F6               [ 1]  230 	ld	a, (x)
+      0000B9 A5 40            [ 1]  231 	bcp	a, #0x40
+      0000BB 27 F8            [ 1]  232 	jreq	00101$
+                                    233 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 58: *(buf++) = I2C_DR;
+      0000BD AE 52 16         [ 2]  234 	ldw	x, #0x5216
+      0000C0 F6               [ 1]  235 	ld	a, (x)
+      0000C1 90 F7            [ 1]  236 	ld	(y), a
+      0000C3 90 5C            [ 2]  237 	incw	y
+      0000C5 17 05            [ 2]  238 	ldw	(0x05, sp), y
+      0000C7 20 D3            [ 2]  239 	jra	00104$
+      0000C9                        240 00106$:
+                                    241 ;	/home/scott/Samples/stm8-bare-min/stm8/i2c.c: 60: *buf = i2c_read();
+      0000C9 90 89            [ 2]  242 	pushw	y
+      0000CB CDr00r83         [ 4]  243 	call	_i2c_read
+      0000CE 90 85            [ 2]  244 	popw	y
+      0000D0 90 F7            [ 1]  245 	ld	(y), a
+      0000D2 5B 02            [ 2]  246 	addw	sp, #2
+      0000D4 81               [ 4]  247 	ret
+                                    248 	.area CODE
+                                    249 	.area INITIALIZER
+                                    250 	.area CABS (ABS)
